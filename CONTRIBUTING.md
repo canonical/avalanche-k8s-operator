@@ -1,6 +1,6 @@
-# Contributing to karma-operator
+# Contributing to avalanche-operator
 The intended use case of this operator is to be deployed together with
-alertmanager-operator or karma-alertmanager-proxy-operator.
+prometheus-operator.
 
 ## Bugs and pull requests
 - Generally, before developing enhancements to this charm, you should consider
@@ -9,7 +9,7 @@ alertmanager-operator or karma-alertmanager-proxy-operator.
   implementation, you can reach us at
   [Canonical Mattermost public channel](https://chat.charmhub.io/charmhub/channels/charm-dev)
   or [Discourse](https://discourse.charmhub.io/).
-- All enhancements require review before being merged. Besides the
+- All enhancements require review before being merged. Apart from
   code quality and test coverage, the review will also take into
   account the resulting user experience for Juju administrators using
   this charm.
@@ -45,10 +45,10 @@ pip install --upgrade -r requirements.txt
 ### Testing
 
 ```shell
-tox -e prettify  # update your code according to linting rules
-tox -e lint      # code style
-tox -e static    # static analysis
-tox -e unit      # unit tests
+tox -e fmt    # update your code according to linting rules
+tox -e lint   # code style
+tox -e static # static analysis
+tox -e unit   # unit tests
 ```
 
 tox creates virtual environment for every tox environment defined in
@@ -68,9 +68,9 @@ charmcraft pack
 
 ## Usage
 ### Tested images
-- [ghcr.io/prymitive/karma](https://ghcr.io/prymitive/karma)
+- [quay.io/freshtracks.io/avalanche](https://quay.io/freshtracks.io/avalanche)
 
-### Deploy Karma
+### Deploy Avalanche
 
 ```shell
 juju deploy ./avalanche-k8s.charm \
@@ -84,22 +84,9 @@ juju deploy ./avalanche-k8s.charm \
 - All lifecycle events call a common hook, `_common_exit_hook` after executing
   their own business logic. This pattern simplifies state tracking and improves
   consistency.
-- On startup, the charm waits for `PebbleReadyEvent` and for an IP address to
-  become available before starting the alertmanager service and declaring
-  `ActiveStatus`.
 
 ## Design choices
-- The charm attempts to start the karma server only if there is an active
-  `alerting` relation. This is needed because if karma cannot communicate with
-  an alertmanager server, it will exit immediately, which would cause pebble to
-  report a failure and keep retrying.
+NTA
 
 ## Roadmap
-* Tests:
-  * Add relation to the tests
-  * review coverage
-  * Add karma.py to tests
-* TLS support for UI -> ideally certificates via relation to easyrsa or similar
-* TLS client auth
-* Authentication (TLS UI is a prerequisite)
-* Functional tests
+TBD
