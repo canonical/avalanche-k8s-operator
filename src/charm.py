@@ -131,7 +131,11 @@ class AvalancheCharm(CharmBase):
                         "override": "replace",
                         "summary": "avalanche service",
                         "startup": "enabled",
-                        "command": f"/bin/avalanche --metric-count=1 --series-count=1 --port={self.port}",  # TODO add args
+                        "command": f"/bin/avalanche "
+                        f"--metric-count={self.config['metric-count']} "
+                        f"--label-count={self.config['label-count']} "
+                        f"--series-count={self.config['series-count']} "
+                        f"--port={self.port}",
                     },
                 },
             }
