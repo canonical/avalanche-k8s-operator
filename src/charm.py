@@ -3,10 +3,10 @@
 # See LICENSE file for licensing details.
 
 """Deploy Avalanche to a Kubernetes environment."""
-
 import hashlib
 import logging
 
+from charms.prometheus_k8s.v0.prometheus import MetricsEndpointProvider
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
@@ -41,6 +41,19 @@ class AvalancheCharm(CharmBase):
         self._stored.set_default(servers={}, config_hash=None)
 
         self.container = self.unit.get_container(self._container_name)
+
+        self.metrics_endpoint = MetricsEndpointProvider(
+            self,
+            "metrics-endpoint",
+            self.on.avalanche_pebble_ready,
+            jobs=[
+                {
+                    "job_name": self.unit.name,
+                    "metrics_path": "/metrics",
+                    "static_configs": [{"targets": [f"*:{self.port}"]}],
+                }
+            ],
+        )
 
         # Core lifecycle events
         self.framework.observe(self.on.install, self._on_install)

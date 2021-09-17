@@ -19,7 +19,7 @@ resources:
     upstream-source: quay.io/freshtracks.io/avalanche
 
 provides:
-  monitoring:
+  metrics-endpoint:
     interface: prometheus_scrape
 
 peers:
