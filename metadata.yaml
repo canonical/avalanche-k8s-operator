@@ -1,0 +1,27 @@
+# Copyright 2021 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+name: avalanche-k8s
+display-name: Avalanche
+description: |
+  Avalanche is ...
+summary: |
+  Load tester for openmetrics endpoints.
+
+containers:
+  avalanche:
+    resource: avalanche-image
+
+resources:
+  avalanche-image:
+    type: oci-image
+    description: OCI image for avalanche
+    upstream-source: quay.io/freshtracks.io/avalanche
+
+provides:
+  monitoring:
+    interface: prometheus_scrape
+
+peers:
+  replicas:
+    interface: avalanche_replica
