@@ -2,7 +2,6 @@
 # See LICENSE file for licensing details.
 
 name: avalanche-k8s
-display-name: Avalanche
 description: |
   Avalanche is ...
 summary: |
