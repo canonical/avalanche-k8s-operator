@@ -14,14 +14,25 @@ options:
     type: int
     description: Number of series per-metric.
     default: 10
+  metricname-length:
+    type: int
+    description: Modify length of metric names.
+    default: 5
+  labelname-length:
+    type: int
+    description: Modify length of label names.
+    default: 5
+  value-interval:
+    type: int
+    description: Change series values every {interval} seconds.
+    default: 30
 
 
-#  --metricname-length=5          Modify length of metric names.
-#  --labelname-length=5           Modify length of label names.
 #  --const-label=CONST-LABEL ...  Constant label to add to every metric. Format
 #                                 is labelName=labelValue. Flag can be specified
 #                                 multiple times.
-#  --value-interval=30            Change series values every {interval} seconds.
+
+
 #  --series-interval=60           Change series_id label values every {interval}
 #                                 seconds.
 #  --metric-interval=120          Change __name__ label values every {interval}

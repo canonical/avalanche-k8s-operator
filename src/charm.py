@@ -6,7 +6,7 @@
 import hashlib
 import logging
 
-from charms.prometheus_k8s.v0.prometheus import MetricsEndpointProvider
+from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
@@ -51,6 +51,8 @@ class AvalancheCharm(CharmBase):
                     "job_name": self.unit.name,
                     "metrics_path": "/metrics",
                     "static_configs": [{"targets": [f"*:{self.port}"]}],
+                    "scrape_interval": "1s",  # TODO move to config.yaml
+                    "scrape_timeout": "1s",
                 }
             ],
         )
@@ -122,6 +124,17 @@ class AvalancheCharm(CharmBase):
 
     def _layer(self) -> Layer:
         """Returns the Pebble configuration layer for Avalanche."""
+
+        def _command():
+            return f"/bin/avalanche " \
+                   f"--metric-count={self.config['metric-count']} " \
+                   f"--label-count={self.config['label-count']} " \
+                   f"--series-count={self.config['series-count']} " \
+                   f"--metricname-length={self.config['metricname-length']} " \
+                   f"--labelname-length={self.config['labelname-length']} " \
+                   f"--value-interval={self.config['value-interval']} " \
+                   f"--port={self.port}"
+
         return Layer(
             {
                 "summary": "avalanche layer",
@@ -131,11 +144,7 @@ class AvalancheCharm(CharmBase):
                         "override": "replace",
                         "summary": "avalanche service",
                         "startup": "enabled",
-                        "command": f"/bin/avalanche "
-                        f"--metric-count={self.config['metric-count']} "
-                        f"--label-count={self.config['label-count']} "
-                        f"--series-count={self.config['series-count']} "
-                        f"--port={self.port}",
+                        "command": _command(),
                     },
                 },
             }

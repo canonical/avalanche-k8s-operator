@@ -163,6 +163,21 @@ each job must be given a unique name. For example
 It is also possible to configure other scrape related parameters using
 these job specifications as described by the Prometheus
 [documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config).
+The permissible subset of job specific scrape configuration parameters
+supported in a `MetricsEndpointProvider` job specification are:
+
+- `job_name`
+- `metrics_path`
+- `static_configs`
+- `scrape_interval`
+- `scrape_timeout`
+- `proxy_url`
+- `relabel_configs`
+- `metrics_relabel_configs`
+- `sample_limit`
+- `label_limit`
+- `label_name_length_limit`
+- `label_value_lenght_limit`
 
 ## Consumer Library Usage
 
@@ -300,21 +315,49 @@ LIBPATCH = 6
 logger = logging.getLogger(__name__)
 
 
+JOB_KEYS = {
+    "job_name",
+    "metrics_path",
+    "static_configs",
+    "scrape_interval",
+    "scrape_timeout",
+    "proxy_url",
+    "relabel_configs",
+    "metrics_relabel_configs",
+    "sample_limit",
+    "label_limit",
+    "label_name_length_limit",
+    "label_value_lenght_limit",
+}
+DEFAULT_JOB = {
+    "metrics_path": "/metrics",
+    "static_configs": [{"targets": ["*:80"]}],
+}
+
+
 def _sanitize_scrape_configuration(job) -> dict:
     """Restrict permissible scrape configuration options.
 
+    If job is empty then a default job is returned. The
+    default job is
+
+    ```
+    {
+        "metrics_path": "/metrics",
+        "static_configs": [{"targets": ["*:80"]}],
+    }
+    ```
+
     Args:
-        job: a dict containing a single Prometheus job_name
+        job: a dict containing a single Prometheus job
             specification.
 
     Returns:
         a dictionary containing a sanitized job specification.
     """
-    return {
-        "job_name": job.get("job_name"),
-        "metrics_path": job.get("metrics_path", "/metrics"),
-        "static_configs": job.get("static_configs", [{"targets": ["*:80"]}]),
-    }
+    sanitized_job = DEFAULT_JOB.copy()
+    sanitized_job.update({key: value for key, value in job.items() if key in JOB_KEYS})
+    return sanitized_job
 
 
 class TargetsChangedEvent(EventBase):
@@ -548,12 +591,13 @@ class MetricsEndpointConsumer(Object):
         name = job.get("job_name")
         job_name = f"{job_name_prefix}_{name}" if name else job_name_prefix
 
-        config = {"job_name": job_name, "metrics_path": job["metrics_path"]}
+        labeled_job = job.copy()
+        labeled_job["job_name"] = job_name
 
         static_configs = job.get("static_configs")
-        config["static_configs"] = []
+        labeled_job["static_configs"] = []
 
-        relabel_config = {
+        instance_relabel_config = {
             "source_labels": ["juju_model", "juju_model_uuid", "juju_application"],
             "separator": "_",
             "target_label": "instance",
@@ -583,20 +627,23 @@ class MetricsEndpointConsumer(Object):
                 unitless_config = self._labeled_unitless_config(
                     unitless_targets, labels, scrape_metadata
                 )
-                config["static_configs"].append(unitless_config)
+                labeled_job["static_configs"].append(unitless_config)
 
             # label scrape targets that do have unit labels
             for host_name, host_address in hosts.items():
                 static_config = self._labeled_unit_config(
                     host_name, host_address, ports, labels, scrape_metadata
                 )
-                config["static_configs"].append(static_config)
-                if "juju_unit" not in relabel_config["source_labels"]:
-                    relabel_config["source_labels"].append("juju_unit")
+                labeled_job["static_configs"].append(static_config)
+                if "juju_unit" not in instance_relabel_config["source_labels"]:
+                    instance_relabel_config["source_labels"].append("juju_unit")
 
-        config["relabel_configs"] = [relabel_config]
+        # ensure topology relabeling of instance label is last in order of relabelings
+        relabel_configs = job.get("relabel_configs", [])
+        relabel_configs.append(instance_relabel_config)
+        labeled_job["relabel_configs"] = relabel_configs
 
-        return config
+        return labeled_job
 
     def _set_juju_labels(self, labels, scrape_metadata) -> dict:
         """Create a copy of metric labels with Juju topology information.
