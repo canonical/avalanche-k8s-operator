@@ -126,14 +126,16 @@ class AvalancheCharm(CharmBase):
         """Returns the Pebble configuration layer for Avalanche."""
 
         def _command():
-            return f"/bin/avalanche " \
-                   f"--metric-count={self.config['metric-count']} " \
-                   f"--label-count={self.config['label-count']} " \
-                   f"--series-count={self.config['series-count']} " \
-                   f"--metricname-length={self.config['metricname-length']} " \
-                   f"--labelname-length={self.config['labelname-length']} " \
-                   f"--value-interval={self.config['value-interval']} " \
-                   f"--port={self.port}"
+            return (
+                f"/bin/avalanche "
+                f"--metric-count={self.config['metric-count']} "
+                f"--label-count={self.config['label-count']} "
+                f"--series-count={self.config['series-count']} "
+                f"--metricname-length={self.config['metricname-length']} "
+                f"--labelname-length={self.config['labelname-length']} "
+                f"--value-interval={self.config['value-interval']} "
+                f"--port={self.port}"
+            )
 
         return Layer(
             {
