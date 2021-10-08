@@ -45,7 +45,6 @@ class AvalancheCharm(CharmBase):
         self.metrics_endpoint = MetricsEndpointProvider(
             self,
             "metrics-endpoint",
-            self.on.avalanche_pebble_ready,
             jobs=[
                 {
                     "job_name": self.unit.name,
