@@ -2,27 +2,27 @@
 # See LICENSE file for licensing details.
 
 options:
-  metric-count:
+  metric_count:
     type: int
     description: Number of metrics to serve.
     default: 500
-  label-count:
+  label_count:
     type: int
     description: Number of labels per-metric.
     default: 10
-  series-count:
+  series_count:
     type: int
     description: Number of series per-metric.
     default: 10
-  metricname-length:
+  metricname_length:
     type: int
     description: Modify length of metric names.
     default: 5
-  labelname-length:
+  labelname_length:
     type: int
     description: Modify length of label names.
     default: 5
-  value-interval:
+  value_interval:
     type: int
     description: Change series values every {interval} seconds.
     default: 30

@@ -127,12 +127,12 @@ class AvalancheCharm(CharmBase):
         def _command():
             return (
                 f"/bin/avalanche "
-                f"--metric-count={self.config['metric-count']} "
-                f"--label-count={self.config['label-count']} "
-                f"--series-count={self.config['series-count']} "
-                f"--metricname-length={self.config['metricname-length']} "
-                f"--labelname-length={self.config['labelname-length']} "
-                f"--value-interval={self.config['value-interval']} "
+                f"--metric-count={self.config['metric_count']} "
+                f"--label-count={self.config['label_count']} "
+                f"--series-count={self.config['series_count']} "
+                f"--metricname-length={self.config['metricname_length']} "
+                f"--labelname-length={self.config['labelname_length']} "
+                f"--value-interval={self.config['value_interval']} "
                 f"--port={self.port}"
             )
 
