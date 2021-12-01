@@ -133,6 +133,8 @@ class AvalancheCharm(CharmBase):
                 f"--metricname-length={self.config['metricname_length']} "
                 f"--labelname-length={self.config['labelname_length']} "
                 f"--value-interval={self.config['value_interval']} "
+                f"--series-interval={self.config['series_interval']} "
+                f"--metric-interval={self.config['metric_interval']} "
                 f"--port={self.port}"
             )
 

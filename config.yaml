@@ -26,6 +26,21 @@ options:
     type: int
     description: Change series values every {interval} seconds.
     default: 30
+  series_interval:
+    type: int
+    description: >
+      Change series_id label values every {interval} seconds.
+      Avalanche's CLI default value is 60, but this is too low and quickly overloads the scraper.
+      Using 3600000 (10k hours ~ 1 year) in lieu of "inf" (never refresh).
+    default: 36000000
+  metric_interval:
+    type: int
+    description: >
+      Change __name__ label values every {interval} seconds.
+      Avalanche's CLI default value is 120, but this is too low and quickly overloads the scraper.
+      Using 3600000 (10k hours ~ 1 year) in lieu of "inf" (never refresh).
+    default: 36000000
+    
 
 
 #  --const-label=CONST-LABEL ...  Constant label to add to every metric. Format
@@ -33,10 +48,6 @@ options:
 #                                 multiple times.
 
 
-#  --series-interval=60           Change series_id label values every {interval}
-#                                 seconds.
-#  --metric-interval=120          Change __name__ label values every {interval}
-#                                 seconds.
 #  --port=9001                    Port to serve at
 #  --remote-url=REMOTE-URL        URL to send samples via remote_write API.
 #  --remote-pprof-urls=REMOTE-PPROF-URLS ...
