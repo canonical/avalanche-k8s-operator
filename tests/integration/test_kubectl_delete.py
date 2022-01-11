@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 METADATA = yaml.safe_load(Path("./metadata.yaml").read_text())
 app_name = METADATA["name"]
-config = {"external_hostname": "just.a.test"}
+config = {"metric_count": 33, "value_interval": 99999}
 
 
 @pytest.mark.abort_on_fail
