@@ -6,6 +6,9 @@
 import hashlib
 import logging
 
+from charms.prometheus_k8s.v0.prometheus_remote_write import (
+    PrometheusRemoteWriteConsumer,
+)
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from ops.charm import CharmBase
 from ops.framework import StoredState
@@ -50,10 +53,16 @@ class AvalancheCharm(CharmBase):
                     "job_name": self.unit.name,
                     "metrics_path": "/metrics",
                     "static_configs": [{"targets": [f"*:{self.port}"]}],
-                    "scrape_interval": "1s",  # TODO move to config.yaml
-                    "scrape_timeout": "1s",
+                    "scrape_interval": "15s",  # TODO move to config.yaml
+                    "scrape_timeout": "10s",
                 }
             ],
+        )
+
+        self.remote_write_consumer = PrometheusRemoteWriteConsumer(self)
+        self.framework.observe(
+            self.remote_write_consumer.on.endpoints_changed,
+            self._remote_write_endpoints_changed,
         )
 
         # Core lifecycle events
@@ -125,6 +134,13 @@ class AvalancheCharm(CharmBase):
         """Returns the Pebble configuration layer for Avalanche."""
 
         def _command():
+            if endpoints := self.remote_write_consumer.endpoints:
+                # avalanche cli args support only one remote write target; take the first one
+                endpoint = endpoints[0]["url"]
+                remote_write_args = f"--remote-url={endpoint} --remote-write-interval=15s"
+            else:
+                remote_write_args = ""
+
             return (
                 f"/bin/avalanche "
                 f"--metric-count={self.config['metric_count']} "
@@ -135,7 +151,8 @@ class AvalancheCharm(CharmBase):
                 f"--value-interval={self.config['value_interval']} "
                 f"--series-interval={self.config['series_interval']} "
                 f"--metric-interval={self.config['metric_interval']} "
-                f"--port={self.port}"
+                f"--port={self.port} "
+                f"{remote_write_args}"
             )
 
         return Layer(
@@ -224,6 +241,10 @@ class AvalancheCharm(CharmBase):
         Logs list of peers, uptime and version info.
         """
         pass
+
+    def _remote_write_endpoints_changed(self, _):
+        """Event handler for remote write endpoints_changed."""
+        self._common_exit_hook()
 
 
 if __name__ == "__main__":

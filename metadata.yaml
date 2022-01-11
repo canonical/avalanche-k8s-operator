@@ -21,6 +21,10 @@ provides:
   metrics-endpoint:
     interface: prometheus_scrape
 
+requires:
+    receive-remote-write:
+        interface: prometheus_remote_write
+
 peers:
   replicas:
     interface: avalanche_replica
