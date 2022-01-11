@@ -73,7 +73,7 @@ charmcraft pack
 ### Deploy Avalanche
 
 ```shell
-juju deploy ./avalanche-k8s.charm \
+juju deploy ./avalanche-k8s_ubuntu-20.04-amd64.charm \
   --resource avalanche-image=quay.io/freshtracks.io/avalanche
 ```
 
