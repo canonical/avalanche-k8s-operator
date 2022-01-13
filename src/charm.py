@@ -137,10 +137,17 @@ class AvalancheCharm(CharmBase):
             if endpoints := self.remote_write_consumer.endpoints:
                 # remote-write mode TODO error out / block if both relations present
                 # avalanche cli args support only one remote write target; take the first one
+                logger.debug(
+                    "Going into remote write mode; remote write endpoints: %s",
+                    self.remote_write_consumer.endpoints,
+                )
+
                 endpoint = endpoints[0]["url"]
                 mode_args = f"--remote-url={endpoint} --remote-write-interval=15s"
             else:
-                # scrape mode
+                # scraped mode
+                logger.debug("Going into scraped mode (no remote write endpoints)")
+
                 mode_args = f"--port={self.port}"
 
             return (
