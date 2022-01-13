@@ -135,11 +135,13 @@ class AvalancheCharm(CharmBase):
 
         def _command():
             if endpoints := self.remote_write_consumer.endpoints:
+                # remote-write mode TODO error out / block if both relations present
                 # avalanche cli args support only one remote write target; take the first one
                 endpoint = endpoints[0]["url"]
-                remote_write_args = f"--remote-url={endpoint} --remote-write-interval=15s"
+                mode_args = f"--remote-url={endpoint} --remote-write-interval=15s"
             else:
-                remote_write_args = ""
+                # scrape mode
+                mode_args = f"--port={self.port}"
 
             return (
                 f"/bin/avalanche "
@@ -151,8 +153,7 @@ class AvalancheCharm(CharmBase):
                 f"--value-interval={self.config['value_interval']} "
                 f"--series-interval={self.config['series_interval']} "
                 f"--metric-interval={self.config['metric_interval']} "
-                f"--port={self.port} "
-                f"{remote_write_args}"
+                f"{mode_args} "
             )
 
         return Layer(
