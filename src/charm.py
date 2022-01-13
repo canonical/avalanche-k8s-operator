@@ -118,7 +118,10 @@ class AvalancheCharm(CharmBase):
 
         if self._service_name not in plan.services or overlay.services != plan.services:
             logger.debug(
-                "Layer changed; command: %s", plan.services.get(self._service_name).command
+                "Layer changed; command: %s",
+                plan.services.get(self._service_name).command
+                if self._service_name in plan.services
+                else overlay.services[self._service_name].command,
             )
             is_changed = True
             self.container.add_layer(self._layer_name, overlay, combine=True)
