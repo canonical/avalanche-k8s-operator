@@ -18,8 +18,8 @@ METADATA = yaml.safe_load(Path("./metadata.yaml").read_text())
 @pytest.mark.abort_on_fail
 async def test_build_and_deploy(ops_test, charm_under_test):
     """Deploy the charm-under-test and deploy it together with related charms."""
-    ops_test.model.set_config({"logging-config": "<root>=WARNING; unit=DEBUG"})
-    
+    await ops_test.model.set_config({"logging-config": "<root>=WARNING; unit=DEBUG"})
+
     # deploy charm from local source folder
     resources = {"avalanche-image": METADATA["resources"]["avalanche-image"]["upstream-source"]}
     await ops_test.model.deploy(charm_under_test, resources=resources, application_name="av")

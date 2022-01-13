@@ -81,11 +81,11 @@ class AvalancheCharm(CharmBase):
 
         # Update pebble layer
         config_changed = self._update_config()
-        layer_changed = self._update_layer(restart=False)
+        self._update_layer()
         service_running = (
             service := self.container.get_service(self._service_name)
         ) and service.is_running()
-        if layer_changed or config_changed or not service_running:
+        if config_changed or not service_running:
             if not self._restart_service():
                 self.unit.status = BlockedStatus("Service restart failed")
                 return
@@ -103,7 +103,7 @@ class AvalancheCharm(CharmBase):
         """
         return False
 
-    def _update_layer(self, restart: bool) -> bool:
+    def _update_layer(self) -> bool:
         """Update service layer to reflect changes in peers (replicas).
 
         Args:
@@ -117,11 +117,14 @@ class AvalancheCharm(CharmBase):
         is_changed = False
 
         if self._service_name not in plan.services or overlay.services != plan.services:
+            logger.debug(
+                "Layer changed; command: %s", plan.services.get(self._service_name).command
+            )
             is_changed = True
             self.container.add_layer(self._layer_name, overlay, combine=True)
-
-        if is_changed and restart:
-            self._restart_service()
+            self.container.replan()
+        else:
+            logger.debug("Layer unchanged")
 
         return is_changed
 
