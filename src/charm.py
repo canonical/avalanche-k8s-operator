@@ -141,7 +141,7 @@ class AvalancheCharm(CharmBase):
     def _layer(self) -> Layer:
         """Returns the Pebble configuration layer for Avalanche."""
 
-        def _command():
+        def _command() -> str:
             if endpoints := self.remote_write_consumer.endpoints:
                 # remote-write mode TODO error out / block if both relations present
                 # avalanche cli args support only one remote write target; take the first one
@@ -180,7 +180,7 @@ class AvalancheCharm(CharmBase):
                         "override": "replace",
                         "summary": "avalanche service",
                         "startup": "enabled",
-                        "command": _command(),
+                        "command": _command().rstrip(),
                     },
                 },
             }
