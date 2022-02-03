@@ -80,28 +80,16 @@ class AvalancheCharm(CharmBase):
             return
 
         # Update pebble layer
-        config_changed = self._update_config()
         layer_changed = self._update_layer()
         service_running = (
             service := self.container.get_service(self._service_name)
         ) and service.is_running()
-        if layer_changed or config_changed or not service_running:
+        if layer_changed or not service_running:
             if not self._restart_service():
                 self.unit.status = BlockedStatus("Service restart failed")
                 return
 
         self.unit.status = ActiveStatus()
-
-    def _update_config(self) -> bool:
-        """Update the avalanche yml config file to reflect changes in configuration.
-
-        Args:
-          None
-
-        Returns:
-          True if config changed; False otherwise
-        """
-        return False
 
     def _update_layer(self) -> bool:
         """Update service layer to reflect changes in peers (replicas).
@@ -114,6 +102,7 @@ class AvalancheCharm(CharmBase):
         """
         overlay = self._layer()
         plan = self.container.get_plan()
+
         is_changed = False
 
         if self._service_name not in plan.services or overlay.services != plan.services:
@@ -151,6 +140,7 @@ class AvalancheCharm(CharmBase):
                 )
 
                 endpoint = endpoints[0]["url"]
+                # TODO offer remote-write-interval as config option
                 mode_args = f"--remote-url={endpoint} --remote-write-interval=15s"
             else:
                 # scraped mode
