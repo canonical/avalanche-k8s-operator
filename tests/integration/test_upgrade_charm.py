@@ -23,7 +23,7 @@ async def test_config_values_are_retained_after_pod_upgraded(ops_test, charm_und
     resources = {"avalanche-image": METADATA["resources"]["avalanche-image"]["upstream-source"]}
     await ops_test.model.deploy(f"ch:{app_name}", application_name=app_name, channel="edge")
 
-    config = {"metric_count": 33, "value_interval": 99999}
+    config = {"metric_count": "33", "value_interval": "99999"}
     await ops_test.model.applications[app_name].set_config(config)
     await ops_test.model.wait_for_idle(apps=[app_name], status="active", timeout=1000)
 
