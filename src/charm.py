@@ -6,6 +6,9 @@
 import hashlib
 import logging
 
+from charms.prometheus_k8s.v0.prometheus_remote_write import (
+    PrometheusRemoteWriteConsumer,
+)
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from ops.charm import CharmBase
 from ops.framework import StoredState
@@ -50,10 +53,16 @@ class AvalancheCharm(CharmBase):
                     "job_name": self.unit.name,
                     "metrics_path": "/metrics",
                     "static_configs": [{"targets": [f"*:{self.port}"]}],
-                    "scrape_interval": "1s",  # TODO move to config.yaml
-                    "scrape_timeout": "1s",
+                    "scrape_interval": "15s",  # TODO move to config.yaml
+                    "scrape_timeout": "10s",
                 }
             ],
+        )
+
+        self.remote_write_consumer = PrometheusRemoteWriteConsumer(self)
+        self.framework.observe(
+            self.remote_write_consumer.on.endpoints_changed,
+            self._remote_write_endpoints_changed,
         )
 
         # Core lifecycle events
@@ -71,30 +80,18 @@ class AvalancheCharm(CharmBase):
             return
 
         # Update pebble layer
-        config_changed = self._update_config()
-        layer_changed = self._update_layer(restart=False)
+        layer_changed = self._update_layer()
         service_running = (
             service := self.container.get_service(self._service_name)
         ) and service.is_running()
-        if layer_changed or config_changed or not service_running:
+        if layer_changed or not service_running:
             if not self._restart_service():
                 self.unit.status = BlockedStatus("Service restart failed")
                 return
 
         self.unit.status = ActiveStatus()
 
-    def _update_config(self) -> bool:
-        """Update the avalanche yml config file to reflect changes in configuration.
-
-        Args:
-          None
-
-        Returns:
-          True if config changed; False otherwise
-        """
-        return False
-
-    def _update_layer(self, restart: bool) -> bool:
+    def _update_layer(self) -> bool:
         """Update service layer to reflect changes in peers (replicas).
 
         Args:
@@ -105,14 +102,23 @@ class AvalancheCharm(CharmBase):
         """
         overlay = self._layer()
         plan = self.container.get_plan()
+
         is_changed = False
 
         if self._service_name not in plan.services or overlay.services != plan.services:
+            logger.debug(
+                "Layer changed; command: %s",
+                overlay.services[self._service_name].command,
+            )
             is_changed = True
             self.container.add_layer(self._layer_name, overlay, combine=True)
-
-        if is_changed and restart:
-            self._restart_service()
+            self.container.replan()
+            logger.debug(
+                "New layer's command: %s",
+                self.container.get_plan().services.get(self._service_name).command,
+            )
+        else:
+            logger.debug("Layer unchanged")
 
         return is_changed
 
@@ -124,18 +130,37 @@ class AvalancheCharm(CharmBase):
     def _layer(self) -> Layer:
         """Returns the Pebble configuration layer for Avalanche."""
 
-        def _command():
-            return (
-                f"/bin/avalanche "
-                f"--metric-count={self.config['metric_count']} "
-                f"--label-count={self.config['label_count']} "
-                f"--series-count={self.config['series_count']} "
-                f"--metricname-length={self.config['metricname_length']} "
-                f"--labelname-length={self.config['labelname_length']} "
-                f"--value-interval={self.config['value_interval']} "
-                f"--series-interval={self.config['series_interval']} "
-                f"--metric-interval={self.config['metric_interval']} "
-                f"--port={self.port}"
+        def _command() -> str:
+            if endpoints := self.remote_write_consumer.endpoints:
+                # remote-write mode TODO error out / block if both relations present
+                # avalanche cli args support only one remote write target; take the first one
+                logger.debug(
+                    "Going into remote write mode; remote write endpoints: %s",
+                    self.remote_write_consumer.endpoints,
+                )
+
+                endpoint = endpoints[0]["url"]
+                # TODO offer remote-write-interval as config option
+                mode_args = f"--remote-url={endpoint} --remote-write-interval=15s"
+            else:
+                # scraped mode
+                logger.debug("Going into scraped mode (no remote write endpoints)")
+
+                mode_args = f"--port={self.port}"
+
+            return " ".join(
+                [
+                    "/bin/avalanche",
+                    f"--metric-count={self.config['metric_count']}",
+                    f"--label-count={self.config['label_count']}",
+                    f"--series-count={self.config['series_count']}",
+                    f"--metricname-length={self.config['metricname_length']}",
+                    f"--labelname-length={self.config['labelname_length']}",
+                    f"--value-interval={self.config['value_interval']}",
+                    f"--series-interval={self.config['series_interval']}",
+                    f"--metric-interval={self.config['metric_interval']}",
+                    mode_args,
+                ]
             )
 
         return Layer(
@@ -224,6 +249,10 @@ class AvalancheCharm(CharmBase):
         Logs list of peers, uptime and version info.
         """
         pass
+
+    def _remote_write_endpoints_changed(self, _):
+        """Event handler for remote write endpoints_changed."""
+        self._common_exit_hook()
 
 
 if __name__ == "__main__":
