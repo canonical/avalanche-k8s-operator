@@ -148,17 +148,19 @@ class AvalancheCharm(CharmBase):
 
                 mode_args = f"--port={self.port}"
 
-            return (
-                f"/bin/avalanche "
-                f"--metric-count={self.config['metric_count']} "
-                f"--label-count={self.config['label_count']} "
-                f"--series-count={self.config['series_count']} "
-                f"--metricname-length={self.config['metricname_length']} "
-                f"--labelname-length={self.config['labelname_length']} "
-                f"--value-interval={self.config['value_interval']} "
-                f"--series-interval={self.config['series_interval']} "
-                f"--metric-interval={self.config['metric_interval']} "
-                f"{mode_args} "
+            return " ".join(
+                [
+                    "/bin/avalanche",
+                    f"--metric-count={self.config['metric_count']}",
+                    f"--label-count={self.config['label_count']}",
+                    f"--series-count={self.config['series_count']}",
+                    f"--metricname-length={self.config['metricname_length']}",
+                    f"--labelname-length={self.config['labelname_length']}",
+                    f"--value-interval={self.config['value_interval']}",
+                    f"--series-interval={self.config['series_interval']}",
+                    f"--metric-interval={self.config['metric_interval']}",
+                    mode_args,
+                ]
             )
 
         return Layer(
@@ -170,7 +172,7 @@ class AvalancheCharm(CharmBase):
                         "override": "replace",
                         "summary": "avalanche service",
                         "startup": "enabled",
-                        "command": _command().rstrip(),
+                        "command": _command(),
                     },
                 },
             }
