@@ -6,6 +6,7 @@
 import hashlib
 import logging
 
+from charms.grafana_k8s.v0.grafana_dashboard import GrafanaDashboardProvider
 from charms.prometheus_k8s.v0.prometheus_remote_write import (
     PrometheusRemoteWriteConsumer,
 )
@@ -64,6 +65,8 @@ class AvalancheCharm(CharmBase):
             self.remote_write_consumer.on.endpoints_changed,
             self._remote_write_endpoints_changed,
         )
+
+        self.grafana_dashboard_provider = GrafanaDashboardProvider(self)
 
         # Core lifecycle events
         self.framework.observe(self.on.install, self._on_install)
