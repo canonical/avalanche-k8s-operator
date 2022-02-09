@@ -198,11 +198,6 @@
   "templating": {
     "list": [
       {
-        "current": {
-          "selected": true,
-          "text": "juju_cos-lite-load-test_aa7baaa9-a77d-4e37-890a-1b88b4a8688c_prometheus_0",
-          "value": "juju_cos-lite-load-test_aa7baaa9-a77d-4e37-890a-1b88b4a8688c_prometheus_0"
-        },
         "description": null,
         "error": null,
         "hide": 0,
@@ -220,15 +215,6 @@
       },
       {
         "allValue": null,
-        "current": {
-          "selected": true,
-          "text": [
-            "avalanche.us-central1-a.c.lma-light-load-testing.internal:9001"
-          ],
-          "value": [
-            "avalanche.us-central1-a.c.lma-light-load-testing.internal:9001"
-          ]
-        },
         "datasource": "${prometheusds}",
         "definition": "label_values(up, instance)",
         "description": null,
@@ -260,7 +246,7 @@
             "0"
           ]
         },
-        "datasource": "juju_cos-lite-load-test_aa7baaa9-a77d-4e37-890a-1b88b4a8688c_prometheus_0",
+        "datasource": "${prometheusds}",
         "definition": "label_values(avalanche_metric_mmmmm_0_1, series_id)",
         "description": null,
         "error": null,
