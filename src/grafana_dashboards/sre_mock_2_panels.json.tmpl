@@ -21,7 +21,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 6,
   "iteration": 1644338908514,
   "links": [],
   "panels": [
@@ -198,6 +198,12 @@
     "list": [
       {
         "allValue": null,
+        "current": {
+          "isNone": true,
+          "selected": true,
+          "text": "None",
+          "value": ""
+        },
         "datasource": "${prometheusds}",
         "definition": "label_values(up{juju_model=\"$juju_model\",juju_model_uuid=\"$juju_model_uuid\",juju_application=\"$juju_application\"},juju_unit)",
         "description": null,
@@ -320,6 +326,11 @@
       },
       {
         "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "avalanche.us-central1-a.c.lma-light-load-testing.internal:9001",
+          "value": "avalanche.us-central1-a.c.lma-light-load-testing.internal:9001"
+        },
         "datasource": "${prometheusds}",
         "definition": "label_values(up, instance)",
         "description": null,
@@ -343,7 +354,7 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
+          "selected": true,
           "text": [
             "0"
           ],
@@ -372,6 +383,11 @@
         "type": "query"
       },
       {
+        "current": {
+          "selected": false,
+          "text": "juju_cos-lite-load-test_ff0032a9-2458-4ff0-8014-3a2a1eb2845f_prometheus_0",
+          "value": "juju_cos-lite-load-test_ff0032a9-2458-4ff0-8014-3a2a1eb2845f_prometheus_0"
+        },
         "description": null,
         "error": null,
         "hide": 0,
