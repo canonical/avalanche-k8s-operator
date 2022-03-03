@@ -652,23 +652,12 @@
         "useTags": false
       },
       {
-        "description": null,
-        "error": null,
-        "hide": 0,
-        "includeAll": false,
-        "label": null,
-        "multi": false,
-        "name": "prometheusds",
-        "options": [],
-        "query": "prometheus",
-        "queryValue": "",
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "type": "datasource"
-      },
-      {
         "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "avalanche.us-central1-a.c.lma-light-load-testing.internal:9001",
+          "value": "avalanche.us-central1-a.c.lma-light-load-testing.internal:9001"
+        },
         "datasource": "${prometheusds}",
         "definition": "label_values(up, instance)",
         "description": null,
@@ -715,6 +704,21 @@
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"
+      },
+      {
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "prometheusds",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
       }
     ]
   },
