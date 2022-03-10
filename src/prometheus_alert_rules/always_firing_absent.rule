@@ -1,4 +1,4 @@
-alert: AlwaysFiring
+alert: AlwaysFiringDueToAbsentMetric
 expr: absent(some_metric_name_that_shouldnt_exist{job="non_existing_job"})
 for: 0m
 labels:
