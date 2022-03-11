@@ -51,7 +51,7 @@ class AvalancheCharm(CharmBase):
             "metrics-endpoint",
             jobs=[
                 {
-                    "job_name": self.unit.name,
+                    "job_name": self.model.app.name,
                     "metrics_path": "/metrics",
                     "static_configs": [{"targets": [f"*:{self.port}"]}],
                     "scrape_interval": "15s",  # TODO move to config.yaml
