@@ -13,13 +13,12 @@ class TestCharm(unittest.TestCase):
     def setUp(self):
         self.harness = Harness(AvalancheCharm)
         self.addCleanup(self.harness.cleanup)
-        self.harness.begin()
+        self.harness.begin_with_initial_hooks()
 
-    def _check_services_running(self, app):
+    def test_services_running(self):
         """Check that the supplied service is running and charm is ActiveStatus."""
-        service = self.harness.model.unit.get_container(app).get_service(app)
+        service = self.harness.model.unit.get_container(
+            AvalancheCharm._container_name
+        ).get_service(AvalancheCharm._service_name)
         self.assertTrue(service.is_running())
         self.assertEqual(self.harness.model.unit.status, ActiveStatus())
-
-    def test_dummy(self):
-        pass

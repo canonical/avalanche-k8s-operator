@@ -34,5 +34,5 @@ async def test_charm_successfully_relates_to_prometheus(ops_test):
         await ops_test.model.deploy("ch:prometheus-k8s", application_name="prom", channel="edge")
         await ops_test.model.wait_for_idle(apps=["prom"], status="active")
 
-    await ops_test.model.add_relation("prom:receive-remote-write", "av:receive-remote-write")
+    await ops_test.model.add_relation("prom:receive-remote-write", "av:send-remote-write")
     await ops_test.model.wait_for_idle(apps=["av", "prom"], status="active")
