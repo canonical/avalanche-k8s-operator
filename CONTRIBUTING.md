@@ -1,4 +1,6 @@
 # Contributing to avalanche-operator
+![GitHub](https://img.shields.io/github/license/canonical/avalanche-k8s-operator) ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/canonical/avalanche-k8s-operator)
+
 The intended use case of this operator is to be deployed together with
 prometheus-operator.
 
