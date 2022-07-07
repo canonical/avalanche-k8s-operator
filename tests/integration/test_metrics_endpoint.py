@@ -29,7 +29,9 @@ async def test_build_and_deploy(ops_test, charm_under_test):
 async def test_charm_successfully_relates_to_prometheus(ops_test):
     # deploy prometheus
     async with IPAddressWorkaround(ops_test):
-        await ops_test.model.deploy("ch:prometheus-k8s", application_name="prom", channel="edge")
+        await ops_test.model.deploy(
+            "ch:prometheus-k8s", application_name="prom", channel="edge", trust=True
+        )
         await ops_test.model.wait_for_idle(apps=["prom"], status="active")
 
     await ops_test.model.add_relation("prom:metrics-endpoint", "av:metrics-endpoint")
