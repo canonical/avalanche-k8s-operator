@@ -42,7 +42,7 @@ class AvalancheCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self._stored.set_default(servers={}, config_hash=None)
+        self._stored.set_default(servers={}, config_hash=None)  # type: ignore
 
         self.container = self.unit.get_container(self._container_name)
 
