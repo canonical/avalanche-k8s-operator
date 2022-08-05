@@ -182,7 +182,7 @@ class AvalancheCharm(CharmBase):
         )
 
     def _on_install(self, _):
-        """Event handler for the install event during which we will update the K8s service."""
+        """Event handler for the `install` event during which we will update the K8s service."""
         self._patch_k8s_service()
 
     def _on_upgrade_charm(self, _):
@@ -195,7 +195,7 @@ class AvalancheCharm(CharmBase):
         self._common_exit_hook()
 
     def _patch_k8s_service(self):
-        """Fix the Kubernetes service that was setup by Juju with correct port numbers."""
+        """Fix the Kubernetes service that was set up by Juju with correct port numbers."""
         if self.unit.is_leader():
             service_ports = [
                 (f"{self.app.name}", self._port, self._port),

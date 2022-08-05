@@ -38,7 +38,7 @@ copyright-regexp = "Copyright\\s\\d{4}([-,]\\d{4})*\\s+%(author)s"
 [tool.mypy]
 pretty = true
 python_version = 3.8
-mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/lib:$MYPY_CONFIG_FILE_DIR/tests/unit"
+mypy_path = "./src:./lib"
 follow_imports = "normal"
 warn_redundant_casts = true
 warn_unused_ignores = true
@@ -62,3 +62,4 @@ follow_imports = "silent"
 [tool.pytest.ini_options]
 minversion = "6.0"
 log_cli_level = "INFO"
+asyncio_mode = "auto"

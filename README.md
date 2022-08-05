@@ -7,7 +7,7 @@ load tester.
 
 ## Usage
 
-To use Avalanche, you need to be able tor relate to a charm that supports the
+To use Avalanche, you need to be able to relate to a charm that supports the
 `prometheus_scrape` relation interface.
 
 For more information see [INTEGRATING](INTEGRATING.md).
