@@ -2,10 +2,18 @@
 # See LICENSE file for licensing details.
 
 name: avalanche-k8s
+assumes:
+  - k8s-api
+
 description: |
-  Avalanche is ...
+  Avalanche is a prometheus load tester.
+
 summary: |
   Load tester for openmetrics endpoints.
+
+website: https://charmhub.io/avalanche-k8s
+source: https://github.com/canonical/avalanche-k8s-operator
+issues: https://github.com/canonical/avalanche-k8s-operator/issues
 
 containers:
   avalanche:
