@@ -4,4 +4,4 @@
 ops
 PyYAML
 kubernetes
-jinja2
+jinja2 < 3
