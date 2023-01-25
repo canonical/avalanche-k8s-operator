@@ -32,8 +32,8 @@ provides:
     interface: grafana_dashboard
 
 requires:
-    send-remote-write:
-        interface: prometheus_remote_write
+  send-remote-write:
+    interface: prometheus_remote_write
 
 peers:
   replicas:
