@@ -1,5 +1,0 @@
-# Copyright 2023 Canonical Ltd.
-# See LICENSE file for licensing details.
-
-# tox cannot parse this as part of a deps/commands section: it drops everything past the `#`
-git+https://github.com/canonical/observability-libs.git@feature/pipify#egg=jo11y&subdirectory=placeholder
