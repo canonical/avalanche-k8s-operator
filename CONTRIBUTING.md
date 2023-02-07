@@ -1,6 +1,12 @@
 # Contributing to avalanche-operator
-![GitHub](https://img.shields.io/github/license/canonical/avalanche-k8s-operator) ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/canonical/avalanche-k8s-operator) ![GitHub](https://img.shields.io/tokei/lines/github/canonical/avalanche-k8s-operator)
-![GitHub](https://img.shields.io/github/issues/canonical/avalanche-k8s-operator) ![GitHub](https://img.shields.io/github/issues-pr/canonical/avalanche-k8s-operator) ![GitHub](https://img.shields.io/github/contributors/canonical/avalanche-k8s-operator) ![GitHub](https://img.shields.io/github/watchers/canonical/avalanche-k8s-operator?style=social)
+
+![GitHub License](https://img.shields.io/github/license/canonical/avalanche-k8s-operator)
+![GitHub Commit Activity](https://img.shields.io/github/commit-activity/y/canonical/avalanche-k8s-operator)
+![GitHub Lines of Code](https://img.shields.io/tokei/lines/github/canonical/avalanche-k8s-operator)
+![GitHub Issues](https://img.shields.io/github/issues/canonical/avalanche-k8s-operator)
+![GitHub PRs](https://img.shields.io/github/issues-pr/canonical/avalanche-k8s-operator)
+![GitHub Contributors](https://img.shields.io/github/contributors/canonical/avalanche-k8s-operator)
+![GitHub Watchers](https://img.shields.io/github/watchers/canonical/avalanche-k8s-operator?style=social)
 
 The intended use case of this operator is to be deployed together with
 prometheus-operator.
