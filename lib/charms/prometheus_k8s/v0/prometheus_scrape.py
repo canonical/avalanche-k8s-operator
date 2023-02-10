@@ -346,7 +346,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 import yaml
-from jo11y.juju_topology import JujuTopology
+from jo11y import JujuTopology
 from ops.charm import CharmBase, RelationRole
 from ops.framework import (
     BoundEvent,

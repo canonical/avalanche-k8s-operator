@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 import yaml
-from jo11y.juju_topology import JujuTopology
+from jo11y import JujuTopology
 from ops.charm import (
     CharmBase,
     HookEvent,
