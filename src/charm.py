@@ -11,13 +11,12 @@ from charms.prometheus_k8s.v0.prometheus_remote_write import (
     PrometheusRemoteWriteConsumer,
 )
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
+from kubernetes_service import K8sServicePatch, PatchFailed
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
 from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus
 from ops.pebble import Layer
-
-from kubernetes_service import K8sServicePatch, PatchFailed
 
 logger = logging.getLogger(__name__)
 
