@@ -61,7 +61,7 @@ class AvalancheCharm(CharmBase):
 
         self.remote_write_consumer = PrometheusRemoteWriteConsumer(self)
         self.framework.observe(
-            self.remote_write_consumer.on.endpoints_changed, # pyright: ignore
+            self.remote_write_consumer.on.endpoints_changed,  # pyright: ignore
             self._remote_write_endpoints_changed,
         )
 
@@ -71,7 +71,9 @@ class AvalancheCharm(CharmBase):
         self.framework.observe(self.on.install, self._on_install)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)
-        self.framework.observe(self.on.avalanche_pebble_ready, self._on_pebble_ready) # pyright: ignore
+        self.framework.observe(
+            self.on.avalanche_pebble_ready, self._on_pebble_ready
+        )  # pyright: ignore
         self.framework.observe(self.on.start, self._on_start)
         self.framework.observe(self.on.update_status, self._on_update_status)
 

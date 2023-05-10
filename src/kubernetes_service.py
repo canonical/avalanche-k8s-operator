@@ -52,13 +52,10 @@ class K8sServicePatch:
                 raise PatchFailed(
                     "No permission to read cluster role. " "Run `juju trust` on this application."
                 ) from e
-            else:
-                raise e
+            raise e
 
     @staticmethod
-    def _k8s_service(
-        app: str, service_ports: List[Tuple[str, int, int]]
-    ) -> client.V1Service:
+    def _k8s_service(app: str, service_ports: List[Tuple[str, int, int]]) -> client.V1Service:
         """Property accessor to return a valid Kubernetes Service representation for Alertmanager.
 
         Args:
