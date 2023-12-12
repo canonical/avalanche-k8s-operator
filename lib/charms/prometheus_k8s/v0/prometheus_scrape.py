@@ -362,7 +362,9 @@ LIBAPI = 0
 
 # Increment this PATCH version before using `charmcraft publish-lib` or reset
 # to 0 if you are raising the major API version
-LIBPATCH = 38
+LIBPATCH = 44
+
+PYDEPS = ["cosl"]
 
 logger = logging.getLogger(__name__)
 
@@ -384,6 +386,7 @@ ALLOWED_KEYS = {
     "basic_auth",
     "tls_config",
     "authorization",
+    "params",
 }
 DEFAULT_JOB = {
     "metrics_path": "/metrics",
@@ -602,12 +605,12 @@ class PrometheusConfig:
         return {
             "alertmanagers": [
                 {
+                    # For https we still do not render a `tls_config` section because
+                    # certs are expected to be made available by the charm via the
+                    # `update-ca-certificates` mechanism.
                     "scheme": scheme,
                     "path_prefix": path_prefix,
                     "static_configs": [{"targets": netlocs}],
-                    # FIXME figure out how to get alertmanager's ca_file into here
-                    #  Without this, prom errors: "x509: certificate signed by unknown authority"
-                    "tls_config": {"insecure_skip_verify": True},
                 }
                 for (scheme, path_prefix), netlocs in paths.items()
             ]
@@ -762,7 +765,7 @@ def _validate_relation_by_interface_and_direction(
     actual_relation_interface = relation.interface_name
     if actual_relation_interface != expected_relation_interface:
         raise RelationInterfaceMismatchError(
-            relation_name, expected_relation_interface, actual_relation_interface
+            relation_name, expected_relation_interface, actual_relation_interface or "None"
         )
 
     if expected_relation_role == RelationRole.provides:
@@ -855,7 +858,7 @@ class MonitoringEvents(ObjectEvents):
 class MetricsEndpointConsumer(Object):
     """A Prometheus based Monitoring service."""
 
-    on = MonitoringEvents()
+    on = MonitoringEvents()  # pyright: ignore
 
     def __init__(self, charm: CharmBase, relation_name: str = DEFAULT_RELATION_NAME):
         """A Prometheus based Monitoring service.
@@ -1012,7 +1015,6 @@ class MetricsEndpointConsumer(Object):
                 try:
                     scrape_metadata = json.loads(relation.data[relation.app]["scrape_metadata"])
                     identifier = JujuTopology.from_dict(scrape_metadata).identifier
-                    alerts[identifier] = self._tool.apply_label_matchers(alert_rules)  # type: ignore
 
                 except KeyError as e:
                     logger.debug(
@@ -1026,6 +1028,10 @@ class MetricsEndpointConsumer(Object):
                     "Alert rules were found but no usable group or identifier was present."
                 )
                 continue
+
+            # We need to append the relation info to the identifier. This is to allow for cases for there are two
+            # relations which eventually scrape the same application. Issue #551.
+            identifier = f"{identifier}_{relation.name}_{relation.id}"
 
             alerts[identifier] = alert_rules
 
@@ -1174,16 +1180,8 @@ class MetricsEndpointConsumer(Object):
             scrape_configs, hosts, topology
         )
 
-        # If scheme is https but no ca section present, then auto add "insecure_skip_verify",
-        # otherwise scraping errors out with "x509: certificate signed by unknown authority".
-        # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#tls_config
-        for scrape_config in scrape_configs:
-            tls_config = scrape_config.get("tls_config", {})
-            ca_present = "ca" in tls_config or "ca_file" in tls_config
-            if scrape_config.get("scheme") == "https" and not ca_present:
-                tls_config["insecure_skip_verify"] = True
-                scrape_config["tls_config"] = tls_config
-
+        # For https scrape targets we still do not render a `tls_config` section because certs
+        # are expected to be made available by the charm via the `update-ca-certificates` mechanism.
         return scrape_configs
 
     def _relation_hosts(self, relation: Relation) -> Dict[str, Tuple[str, str]]:
@@ -1300,7 +1298,7 @@ def _resolve_dir_against_charm_path(charm: CharmBase, *path_elements: str) -> st
 class MetricsEndpointProvider(Object):
     """A metrics endpoint for Prometheus."""
 
-    on = MetricsEndpointProviderEvents()
+    on = MetricsEndpointProviderEvents()  # pyright: ignore
 
     def __init__(
         self,
@@ -1842,14 +1840,16 @@ class MetricsEndpointAggregator(Object):
             return
 
         jobs = [] + _type_convert_stored(
-            self._stored.jobs
+            self._stored.jobs  # pyright: ignore
         )  # list of scrape jobs, one per relation
         for relation in self.model.relations[self._target_relation]:
             targets = self._get_targets(relation)
             if targets and relation.app:
                 jobs.append(self._static_scrape_job(targets, relation.app.name))
 
-        groups = [] + _type_convert_stored(self._stored.alert_rules)  # list of alert rule groups
+        groups = [] + _type_convert_stored(
+            self._stored.alert_rules  # pyright: ignore
+        )  # list of alert rule groups
         for relation in self.model.relations[self._alert_rules_relation]:
             unit_rules = self._get_alert_rules(relation)
             if unit_rules and relation.app:
@@ -1901,7 +1901,7 @@ class MetricsEndpointAggregator(Object):
             jobs.append(updated_job)
             relation.data[self._charm.app]["scrape_jobs"] = json.dumps(jobs)
 
-            if not _type_convert_stored(self._stored.jobs) == jobs:
+            if not _type_convert_stored(self._stored.jobs) == jobs:  # pyright: ignore
                 self._stored.jobs = jobs
 
     def _on_prometheus_targets_departed(self, event):
@@ -1953,7 +1953,7 @@ class MetricsEndpointAggregator(Object):
 
             relation.data[self._charm.app]["scrape_jobs"] = json.dumps(jobs)
 
-            if not _type_convert_stored(self._stored.jobs) == jobs:
+            if not _type_convert_stored(self._stored.jobs) == jobs:  # pyright: ignore
                 self._stored.jobs = jobs
 
     def _job_name(self, appname) -> str:
@@ -2132,7 +2132,7 @@ class MetricsEndpointAggregator(Object):
                 groups.append(updated_group)
             relation.data[self._charm.app]["alert_rules"] = json.dumps({"groups": groups})
 
-            if not _type_convert_stored(self._stored.alert_rules) == groups:
+            if not _type_convert_stored(self._stored.alert_rules) == groups:  # pyright: ignore
                 self._stored.alert_rules = groups
 
     def _on_alert_rules_departed(self, event):
@@ -2182,7 +2182,7 @@ class MetricsEndpointAggregator(Object):
                 json.dumps({"groups": groups}) if groups else "{}"
             )
 
-            if not _type_convert_stored(self._stored.alert_rules) == groups:
+            if not _type_convert_stored(self._stored.alert_rules) == groups:  # pyright: ignore
                 self._stored.alert_rules = groups
 
     def _get_alert_rules(self, relation) -> dict:
