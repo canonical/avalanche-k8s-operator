@@ -44,7 +44,7 @@ class AvalancheCharm(CharmBase):
         self._stored.set_default(servers={}, config_hash=None)
 
         self.container = self.unit.get_container(self._container_name)
-        self.unit.open_port(protocol="tcp", port=self._port)
+        self.unit.set_ports(self._port)
 
         self.metrics_endpoint = MetricsEndpointProvider(
             self,
