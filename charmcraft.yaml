@@ -13,3 +13,7 @@ parts:
   charm:
     build-packages:
     - git
+    charm-binary-python-packages:
+    - cryptography
+    - pydantic
+    - pydantic-core

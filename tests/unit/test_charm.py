@@ -3,9 +3,10 @@
 
 import unittest
 
-from charm import AvalancheCharm
 from ops.model import ActiveStatus
 from ops.testing import Harness
+
+from charm import AvalancheCharm
 
 
 class TestCharm(unittest.TestCase):
