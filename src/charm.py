@@ -131,7 +131,9 @@ class AvalancheCharm(CharmBase):
             self.container.replan()
             logger.debug(
                 "New layer's command: %s",
-                self.container.get_plan().services.get(self._service_name).command,  # pyright: ignore
+                self.container.get_plan()
+                .services.get(self._service_name)
+                .command,  # pyright: ignore
             )
         else:
             logger.debug("Layer unchanged")
