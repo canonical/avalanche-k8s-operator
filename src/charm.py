@@ -3,14 +3,16 @@
 # See LICENSE file for licensing details.
 
 """Deploy Avalanche to a Kubernetes environment."""
+
 import hashlib
 import logging
+from typing import cast
 
 from charms.grafana_k8s.v0.grafana_dashboard import GrafanaDashboardProvider
-from charms.prometheus_k8s.v0.prometheus_remote_write import (
+from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
+from charms.prometheus_k8s.v1.prometheus_remote_write import (
     PrometheusRemoteWriteConsumer,
 )
-from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
@@ -47,6 +49,8 @@ class AvalancheCharm(CharmBase):
         self.container = self.unit.get_container(self._container_name)
         self.unit.set_ports(self._port)
 
+        self._disable_alerts = cast(bool, self.config["disable_forwarding_alert_rules"])
+
         self.metrics_endpoint = MetricsEndpointProvider(
             self,
             "metrics-endpoint",
@@ -59,9 +63,14 @@ class AvalancheCharm(CharmBase):
                     "scrape_timeout": "10s",
                 }
             ],
+            disable_forwarding_alert_rules=self._disable_alerts,
+            refresh_event=[self.on.config_changed],
         )
 
-        self.remote_write_consumer = PrometheusRemoteWriteConsumer(self)
+        self.remote_write_consumer = PrometheusRemoteWriteConsumer(
+            self,
+            disable_forwarding_alert_rules=self._disable_alerts,
+        )
         self.framework.observe(
             self.remote_write_consumer.on.endpoints_changed,  # pyright: ignore
             self._remote_write_endpoints_changed,
@@ -74,7 +83,8 @@ class AvalancheCharm(CharmBase):
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)
         self.framework.observe(
-            self.on.avalanche_pebble_ready, self._on_pebble_ready  # pyright: ignore
+            self.on.avalanche_pebble_ready,
+            self._on_pebble_ready,  # pyright: ignore
         )
         self.framework.observe(self.on.start, self._on_start)
         self.framework.observe(self.on.update_status, self._on_update_status)
@@ -121,9 +131,7 @@ class AvalancheCharm(CharmBase):
             self.container.replan()
             logger.debug(
                 "New layer's command: %s",
-                self.container.get_plan()
-                .services.get(self._service_name)
-                .command,  # pyright: ignore
+                self.container.get_plan().services.get(self._service_name).command,  # pyright: ignore
             )
         else:
             logger.debug("Layer unchanged")
