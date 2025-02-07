@@ -40,11 +40,11 @@ options:
       Avalanche's CLI default value is 120, but this is too low and quickly overloads the scraper.
       Using 3600000 (10k hours ~ 1 year) in lieu of "inf" (never refresh).
     default: 36000000
-  disable_forwarding_alert_rules:
+  forward_alert_rules:
     type: boolean
     description: >
       Toggle forwarding of alert rules.
-    default: false
+    default: True
     
     
 
