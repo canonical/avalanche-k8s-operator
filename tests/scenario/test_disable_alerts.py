@@ -1,7 +1,6 @@
 # Copyright 2023 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-import json
 
 import pytest
 from ops.testing import Container, Context, Relation, State
