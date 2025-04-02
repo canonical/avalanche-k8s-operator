@@ -1,19 +1,98 @@
 # Copyright 2021 Canonical Ltd.
 # See LICENSE file for licensing details.
-
+name: avalanche-k8s
 type: charm
-bases:
-  - build-on:
-    - name: "ubuntu"
-      channel: "20.04"
-    run-on:
-    - name: "ubuntu"
-      channel: "20.04"
+summary: Load tester for openmetrics endpoints.
+description: Avalanche is a prometheus load tester.
+
+links:
+  website: https://charmhub.io/avalanche-k8s
+  source: https://github.com/canonical/avalanche-k8s-operator
+  issues: https://github.com/canonical/avalanche-k8s-operator/issues
+
+assumes:
+  - k8s-api
+
+platforms:
+  ubuntu@20.04:amd64:
+  ubuntu@24.04:amd64:
+
 parts:
   charm:
-    build-packages:
-    - git
-    charm-binary-python-packages:
-    - cryptography
-    - pydantic
-    - pydantic-core
+    source: .
+    plugin: uv
+    build-packages: [git]
+    build-snaps: [astral-uv]
+    override-build: |
+      craftctl default
+      git describe --always > $CRAFT_PART_INSTALL/version
+
+containers:
+  avalanche:
+    resource: avalanche-image
+
+resources:
+  avalanche-image:
+    type: oci-image
+    description: OCI image for avalanche
+    upstream-source: quay.io/freshtracks.io/avalanche
+
+provides:
+  metrics-endpoint:
+    interface: prometheus_scrape
+  grafana-dashboard:
+    interface: grafana_dashboard
+
+requires:
+  send-remote-write:
+    interface: prometheus_remote_write
+
+peers:
+  replicas:
+    interface: avalanche_replica
+
+config:
+  options:
+    metric_count:
+      type: int
+      description: Number of metrics to serve.
+      default: 500
+    label_count:
+      type: int
+      description: Number of labels per-metric.
+      default: 10
+    series_count:
+      type: int
+      description: Number of series per-metric.
+      default: 10
+    metricname_length:
+      type: int
+      description: Modify length of metric names.
+      default: 5
+    labelname_length:
+      type: int
+      description: Modify length of label names.
+      default: 5
+    value_interval:
+      type: int
+      description: Change series values every {interval} seconds.
+      default: 30
+    series_interval:
+      type: int
+      description: >
+        Change series_id label values every {interval} seconds.
+        Avalanche's CLI default value is 60, but this is too low and quickly overloads the scraper.
+        Using 3600000 (10k hours ~ 1 year) in lieu of "inf" (never refresh).
+      default: 36000000
+    metric_interval:
+      type: int
+      description: >
+        Change __name__ label values every {interval} seconds.
+        Avalanche's CLI default value is 120, but this is too low and quickly overloads the scraper.
+        Using 3600000 (10k hours ~ 1 year) in lieu of "inf" (never refresh).
+      default: 36000000
+    forward_alert_rules:
+      type: boolean
+      description: >
+        Toggle forwarding of alert rules.
+      default: True
