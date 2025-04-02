@@ -1,8 +1,11 @@
-alert: AlwaysFiringDueToAbsentMetric
-expr: absent(some_metric_name_that_shouldnt_exist{job="non_existing_job"})
-for: 0m
-labels:
-  severity: High
-annotations:
-  summary: "Instance {{ $labels.instance }} dummy alarm (always firing)"
-  description: "{{ $labels.instance }} of job {{ $labels.job }} is firing the dummy alarm."
+groups:
+- name: AlwaysFiringDueToAbsentMetric
+  rules:
+  - alert: AlwaysFiringDueToAbsentMetric
+    expr: absent(some_metric_name_that_shouldnt_exist{job="non_existing_job"})
+    for: 0m
+    labels:
+      severity: High
+    annotations:
+      summary: "Instance {{ $labels.instance }} dummy alarm (always firing)"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} is firing the dummy alarm."
