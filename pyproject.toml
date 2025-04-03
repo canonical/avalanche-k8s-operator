@@ -12,6 +12,7 @@ dependencies = [
   "jinja2<3",
   "cryptography",
   "pydantic",
+  "cosl",
 ]
 
 [project.optional-dependencies]
@@ -25,7 +26,6 @@ dev = [
   "pytest",
   "coverage[toml]",
   "ops[testing]",
-  "cosl",
   "markupsafe==2.0.1",
   # Integration
   "juju",
