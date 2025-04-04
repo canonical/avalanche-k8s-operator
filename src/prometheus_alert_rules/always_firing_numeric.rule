@@ -1,8 +1,11 @@
-alert: AlwaysFiringDueToNumericValue
-expr: avalanche_metric_mmmmm_0_0{series_id="0"} > -1
-for: 0m
-labels:
-  severity: High
-annotations:
-  summary: "Instance {{ $labels.instance }} dummy alarm (always firing)"
-  description: "{{ $labels.instance }} of job {{ $labels.job }} is firing the dummy alarm."
+groups:
+- name: AlwaysFiringDueToNumericValue
+  rules:
+  - alert: AlwaysFiringDueToNumericValue
+    expr: avalanche_metric_mmmmm_0_0{series_id="0"} > -1
+    for: 0m
+    labels:
+      severity: High
+    annotations:
+      summary: "Instance {{ $labels.instance }} dummy alarm (always firing)"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} is firing the dummy alarm."
