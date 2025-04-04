@@ -59,7 +59,7 @@ class AvalancheCharm(CharmBase):
                     "job_name": self.model.app.name,
                     "metrics_path": "/metrics",
                     "static_configs": [{"targets": [f"*:{self.port}"]}],
-                    "scrape_interval": "15s",  # TODO move to config.yaml
+                    "scrape_interval": "15s",  # TODO: move to config.yaml
                     "scrape_timeout": "10s",
                 }
             ],
@@ -132,9 +132,7 @@ class AvalancheCharm(CharmBase):
             self.container.replan()
             logger.debug(
                 "New layer's command: %s",
-                self.container.get_plan()
-                .services.get(self._service_name)
-                .command,  # pyright: ignore
+                self.container.get_plan().services.get(self._service_name).command,  # pyright: ignore
             )
         else:
             logger.debug("Layer unchanged")
