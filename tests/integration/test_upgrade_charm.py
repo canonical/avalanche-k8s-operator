@@ -22,7 +22,7 @@ async def test_config_values_are_retained_after_pod_upgraded(ops_test, charm_und
     """Deploy from charmhub and then upgrade with the charm-under-test."""
     logger.info("deploy charm from charmhub")
     resources = {"avalanche-image": METADATA["resources"]["avalanche-image"]["upstream-source"]}
-    resources_arg = f"avalanche-image: {resources['avalanche-image']}"
+    resources_arg = f"avalanche-image={resources['avalanche-image']}"
     sh.juju.deploy(  # type: ignore
         app_name,
         model=ops_test.model,
