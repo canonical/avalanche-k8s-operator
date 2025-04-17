@@ -34,7 +34,7 @@ async def test_config_values_are_retained_after_pod_upgraded(ops_test: OpsTest, 
     )
 
     config = {"metric_count": "33", "value_interval": "99999"}
-    await ops_test.model.applications[app_name].set_config(config)  # type: ignore
+    sh.juju.config(app_name, "metric_count=33", "value_interval=99999", model=ops_test.model.name)  # type: ignore
     await ops_test.model.wait_for_idle(apps=[app_name], status="active", timeout=1000)
 
     logger.info("upgrade deployed charm with local charm %s", charm_under_test)
