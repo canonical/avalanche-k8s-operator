@@ -30,6 +30,7 @@ dev = [
   # Integration
   "juju",
   "pytest-operator",
+  "sh",
 ]
 
 # Testing tools configuration
