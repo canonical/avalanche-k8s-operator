@@ -21,7 +21,9 @@ async def test_config_values_are_retained_after_pod_upgraded(ops_test, charm_und
     """Deploy from charmhub and then upgrade with the charm-under-test."""
     logger.info("deploy charm from charmhub")
     resources = {"avalanche-image": METADATA["resources"]["avalanche-image"]["upstream-source"]}
-    await ops_test.model.deploy(f"ch:{app_name}", application_name=app_name, channel="1/edge")
+    await ops_test.model.deploy(
+        f"ch:{app_name}", application_name=app_name, channel="1/edge", base="ubuntu@20.04"
+    )
 
     config = {"metric_count": "33", "value_interval": "99999"}
     await ops_test.model.applications[app_name].set_config(config)
