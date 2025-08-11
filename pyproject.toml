@@ -28,8 +28,8 @@ dev = [
   "ops[testing]",
   "markupsafe==2.0.1",
   # Integration
-  "juju",
-  "pytest-operator",
+  "jubilant",
+  "sh",
 ]
 
 # Testing tools configuration
