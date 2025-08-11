@@ -30,6 +30,7 @@ dev = [
   # Integration
   "jubilant",
   "sh",
+  "asyncio",
 ]
 
 # Testing tools configuration
