@@ -3,8 +3,6 @@
 
 import logging
 
-from pytest_operator.plugin import OpsTest
-
 log = logging.getLogger(__name__)
 
 
@@ -21,29 +19,3 @@ async def get_config_values(ops_test, app_name) -> dict:
     # https://github.com/juju/python-libjuju/issues/631
     # https://github.com/juju/python-libjuju/issues/630
     return {key: str(config[key]["value"]) for key in config if "value" in config[key]}
-
-
-class IPAddressWorkaround:
-    """Context manager for deploying a charm that needs to have its IP address.
-
-    Due to a juju bug, occasionally some charms finish a startup sequence without
-    having an ip address returned by `bind_address`.
-    https://bugs.launchpad.net/juju/+bug/1929364
-    Issuing dummy update_status just to trigger an event, and then restore it.
-    """
-
-    def __init__(self, ops_test: OpsTest):
-        self.ops_test = ops_test
-
-    async def __aenter__(self):
-        """On entry, the update status interval is set to the minimum 10s."""
-        assert self.ops_test.model
-        config = await self.ops_test.model.get_config()
-        self.revert_to = config["update-status-hook-interval"]
-        await self.ops_test.model.set_config({"update-status-hook-interval": "10s"})
-        return self
-
-    async def __aexit__(self, exc_type, exc_value, exc_traceback):
-        """On exit, the update status interval is reverted to its original value."""
-        assert self.ops_test.model
-        await self.ops_test.model.set_config({"update-status-hook-interval": self.revert_to})
