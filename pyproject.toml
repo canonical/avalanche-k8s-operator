@@ -30,7 +30,7 @@ dev = [
   # Integration
   "jubilant",
   "sh",
-  "asyncio",
+  "pytest-asyncio",
 ]
 
 # Testing tools configuration
