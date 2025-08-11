@@ -3,8 +3,6 @@
 
 import logging
 
-import jubilant
-
 log = logging.getLogger(__name__)
 
 
