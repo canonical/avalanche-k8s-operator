@@ -6,6 +6,7 @@
 
 import hashlib
 import logging
+import socket
 from typing import cast
 
 from charms.grafana_k8s.v0.grafana_dashboard import GrafanaDashboardProvider
@@ -65,6 +66,7 @@ class AvalancheCharm(CharmBase):
             ],
             forward_alert_rules=self._forward_alert_rules,
             refresh_event=[self.on.config_changed],
+            external_url=socket.getfqdn(),
         )
 
         self.remote_write_consumer = PrometheusRemoteWriteConsumer(
