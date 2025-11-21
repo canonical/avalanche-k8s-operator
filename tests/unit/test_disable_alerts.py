@@ -3,18 +3,27 @@
 
 
 import pytest
-from ops.testing import Container, Context, Relation, State
+from ops.testing import Container, Context, Exec, Relation, State
 
 import charm
 
 
+@pytest.fixture(scope="function")
+def avalanche_container():
+    return Container(
+        "avalanche",
+        can_connect=True,
+        execs={Exec(["/bin/avalanche", "--version"], return_code=0, stdout="0.0")},
+    )
+
+
 @pytest.mark.parametrize("forwarding", (True, False))
-def test_forward_alert_rules_scrape(forwarding):
+def test_forward_alert_rules_scrape(forwarding, avalanche_container):
     # GIVEN these relations
     prometheus_relation = Relation("send-remote-write", remote_app_name="prometheus")
     state = State(
         leader=True,
-        containers={Container(name="avalanche", can_connect=True)},
+        containers={avalanche_container},
         relations=[
             prometheus_relation,
         ],
@@ -35,12 +44,12 @@ def test_forward_alert_rules_scrape(forwarding):
 
 
 @pytest.mark.parametrize("forwarding", (True, False))
-def test_forward_alert_rules(forwarding):
+def test_forward_alert_rules(forwarding, avalanche_container):
     # GIVEN these relations
     prometheus_relation = Relation("send-remote-write", remote_app_name="prometheus")
     state = State(
         leader=True,
-        containers={Container(name="avalanche", can_connect=True)},
+        containers={avalanche_container},
         relations=[
             prometheus_relation,
         ],
