@@ -6,16 +6,17 @@
 
 import hashlib
 import logging
-from typing import cast
+import socket
+from typing import Optional, cast
 
 from charms.grafana_k8s.v0.grafana_dashboard import GrafanaDashboardProvider
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from charms.prometheus_k8s.v1.prometheus_remote_write import (
     PrometheusRemoteWriteConsumer,
 )
+from ops import main
 from ops.charm import CharmBase
 from ops.framework import StoredState
-from ops.main import main
 from ops.model import ActiveStatus, BlockedStatus, MaintenanceStatus
 from ops.pebble import Layer
 
@@ -65,6 +66,7 @@ class AvalancheCharm(CharmBase):
             ],
             forward_alert_rules=self._forward_alert_rules,
             refresh_event=[self.on.config_changed],
+            external_url=socket.getfqdn(),
         )
 
         self.remote_write_consumer = PrometheusRemoteWriteConsumer(
@@ -106,7 +108,19 @@ class AvalancheCharm(CharmBase):
                 self.unit.status = BlockedStatus("Service restart failed")
                 return
 
+        if version := self._avalanche_version:
+            self.unit.set_workload_version(version)
+
         self.unit.status = ActiveStatus()
+
+    @property
+    def _avalanche_version(self) -> Optional[str]:
+        if not self.container.can_connect():
+            return None
+        version_output, _ = self.container.exec(["/bin/avalanche", "--version"], combine_stderr=True).wait_output()
+        # Output looks like this:
+        # 0.3
+        return version_output.strip()
 
     def _update_layer(self) -> bool:
         """Update service layer to reflect changes in peers (replicas).

@@ -13,6 +13,7 @@ class TestCharm(unittest.TestCase):
     def setUp(self):
         self.harness = Harness(AvalancheCharm)
         self.addCleanup(self.harness.cleanup)
+        self.harness.handle_exec('avalanche', ['/bin/avalanche', '--version'], result='0.0')
         self.harness.begin_with_initial_hooks()
 
     def test_services_running(self):
