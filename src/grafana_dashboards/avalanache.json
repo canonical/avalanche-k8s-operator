@@ -24,7 +24,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "PA32743115560D9D8"
+        "uid": "${prometheusds}"
       },
       "fieldConfig": {
         "defaults": {
@@ -105,7 +105,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PA32743115560D9D8"
+            "uid": "${prometheusds}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -188,6 +188,6 @@
   "timepicker": {},
   "timezone": "browser",
   "title": "Avalanche",
-  "uid": "d4d44ac8-ff6a-4c87-aa5c-4b717e0adfb6",
+  "uid": "",
   "version": 5
 }
