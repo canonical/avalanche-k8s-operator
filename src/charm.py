@@ -117,7 +117,7 @@ class AvalancheCharm(CharmBase):
     def _avalanche_version(self) -> Optional[str]:
         if not self.container.can_connect():
             return None
-        version_output, _ = self.container.exec(["/bin/avalanche", "--version"]).wait_output()
+        version_output, _ = self.container.exec(["/bin/avalanche", "--version"], combine_stderr=True).wait_output()
         # Output looks like this:
         # 0.3
         return version_output.strip()
