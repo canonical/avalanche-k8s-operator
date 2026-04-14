@@ -59,7 +59,9 @@ def assert_metrics_found(
         wait=wait_fixed(interval),
         before_sleep=before_sleep_log(log, logging.DEBUG),
         retry_error_callback=lambda retry_state: (
-            retry_state.outcome.result() if not retry_state.outcome.failed else []
+            retry_state.outcome.result()  # type: ignore[union-attr]
+            if not retry_state.outcome.failed  # type: ignore[union-attr]
+            else []
         ),
     )
     def _poll() -> list:
