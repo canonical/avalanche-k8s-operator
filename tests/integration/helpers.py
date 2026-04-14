@@ -3,11 +3,18 @@
 
 import json
 import logging
-import time
 import urllib.parse
 import urllib.request
 
 import jubilant
+from tenacity import (
+    before_sleep_log,
+    retry,
+    retry_if_exception_type,
+    retry_if_result,
+    stop_after_delay,
+    wait_fixed,
+)
 
 log = logging.getLogger(__name__)
 
@@ -46,19 +53,23 @@ def assert_metrics_found(
     address = get_prometheus_unit_address(juju, prometheus_app)
     log.info("Polling Prometheus at %s for query: %s", address, promql)
 
-    deadline = time.time() + timeout
-    last_result: list = []
-    while time.time() < deadline:
-        try:
-            last_result = query_prometheus(address, promql)
-            if last_result:
-                log.info("Prometheus returned %d result(s) for: %s", len(last_result), promql)
-                return last_result
-        except Exception as e:
-            log.debug("Prometheus query attempt failed: %s", e)
-        time.sleep(interval)
-
-    raise AssertionError(
-        f"Timed out after {timeout}s waiting for Prometheus results for query: {promql}. "
-        f"Last result: {last_result}"
+    @retry(
+        retry=retry_if_result(lambda result: not result) | retry_if_exception_type(Exception),
+        stop=stop_after_delay(timeout),
+        wait=wait_fixed(interval),
+        before_sleep=before_sleep_log(log, logging.DEBUG),
+        retry_error_callback=lambda retry_state: (
+            retry_state.outcome.result() if not retry_state.outcome.failed else []
+        ),
     )
+    def _poll() -> list:
+        return query_prometheus(address, promql)
+
+    result = _poll()
+    if not result:
+        raise AssertionError(
+            f"Timed out after {timeout}s waiting for Prometheus results for query: {promql}. "
+            f"Last result: {result}"
+        )
+    log.info("Prometheus returned %d result(s) for: %s", len(result), promql)
+    return result
