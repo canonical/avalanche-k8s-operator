@@ -182,7 +182,7 @@ class AvalancheCharm(CharmBase):
             return " ".join(
                 [
                     "/bin/avalanche",
-                    f"--metric-count={self.config['metric_count']}",
+                    f"--gauge-metric-count={self.config['metric_count']}",
                     f"--label-count={self.config['label_count']}",
                     f"--series-count={self.config['series_count']}",
                     f"--metricname-length={self.config['metricname_length']}",
