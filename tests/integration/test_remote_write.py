@@ -7,7 +7,7 @@ from helpers import assert_metrics_found
 
 
 @pytest.mark.abort_on_fail
-async def test_avalanche_remote_writes_to_prometheus(juju: jubilant.Juju, charm, charm_resources):
+def test_avalanche_remote_writes_to_prometheus(juju: jubilant.Juju, charm, charm_resources):
     """Deploy avalanche and Prometheus, relate via remote-write, and verify metrics land."""
     juju.deploy(charm, "avalanche", resources=charm_resources)
     juju.deploy("prometheus-k8s", "prometheus", channel="2/edge", trust=True)

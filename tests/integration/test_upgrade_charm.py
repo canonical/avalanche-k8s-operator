@@ -6,7 +6,7 @@ import pytest
 
 
 @pytest.mark.abort_on_fail
-async def test_upgrade_charm(juju: jubilant.Juju, charm, charm_resources):
+def test_upgrade_charm(juju: jubilant.Juju, charm, charm_resources):
     """Deploy the avalanche and deploy it together with related charms."""
     juju.deploy(
         "avalanche-k8s",

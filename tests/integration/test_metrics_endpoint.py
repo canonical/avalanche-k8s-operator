@@ -7,7 +7,7 @@ from helpers import assert_metrics_found
 
 
 @pytest.mark.abort_on_fail
-async def test_avalanche_is_scraped_by_prometheus(juju: jubilant.Juju, charm, charm_resources):
+def test_avalanche_is_scraped_by_prometheus(juju: jubilant.Juju, charm, charm_resources):
     """Deploy avalanche and Prometheus, relate them, and verify metrics land in Prometheus."""
     juju.deploy(charm, "avalanche", resources=charm_resources)
     juju.deploy("prometheus-k8s", "prometheus", channel="2/edge", trust=True)

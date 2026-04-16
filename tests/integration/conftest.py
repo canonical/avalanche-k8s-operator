@@ -11,10 +11,10 @@ import yaml
 
 
 @pytest.fixture(scope="module")
-async def charm():
+def charm():
     """Charm used for integration testing."""
     if charm_file := os.environ.get("CHARM_PATH"):
-        return Path(charm_file)
+        return Path(charm_file).absolute()
 
     charm = sh.charmcraft.pack()  # type: ignore
     assert charm

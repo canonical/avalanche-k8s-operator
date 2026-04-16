@@ -30,7 +30,6 @@ dev = [
   # Integration
   "jubilant",
   "sh",
-  "pytest-asyncio",
   "tenacity",
 ]
 
@@ -64,7 +63,6 @@ pythonPlatform = "Linux"
 [tool.pytest.ini_options]
 minversion = "6.0"
 log_cli_level = "INFO"
-asyncio_mode = "auto"
 addopts = "--tb=native --verbose --capture=no --log-cli-level=INFO"
 
 [tool.codespell]
