@@ -22,6 +22,10 @@ class Prometheus:
     _retry_on_error: Any = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
+        """Prepare the API Session with Prometheus.
+
+        Wrap the query methods in tenacity for automatic retry.
+        """
         self.session = requests.Session()
         if self.headers:
             self.session.headers.update(self.headers)
