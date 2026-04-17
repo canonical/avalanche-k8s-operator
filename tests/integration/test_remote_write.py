@@ -14,8 +14,8 @@ def test_avalanche_remote_writes_to_prometheus(juju: jubilant.Juju, charm, charm
     juju.integrate("avalanche:send-remote-write", "prometheus:receive-remote-write")
     juju.wait(jubilant.all_active)
 
-    prometheus_url = juju.status().apps["prometheus"].units["prometheus/0"].address
-    prometheus = Prometheus(url=prometheus_url)
+    address = juju.status().apps["prometheus"].units["prometheus/0"].address
+    prometheus = Prometheus(url=f"http://{address}:9090")
     # Remote-written metrics won't have an 'up' target, so query for avalanche-generated metrics
     # directly. Avalanche metric names are auto-generated with the configured metricname_length.
-    assert prometheus.has_metric(name=".*", labels={"job": ".*avalanche.*"})
+    prometheus.wait_for_metric(name=".*", labels={"job": ".*avalanche.*"})

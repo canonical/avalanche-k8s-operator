@@ -15,7 +15,7 @@ def test_avalanche_is_scraped_by_prometheus(juju: jubilant.Juju, charm, charm_re
     juju.wait(jubilant.all_active)
 
     # Verify the scrape target is up
-    prometheus_url = juju.status().apps["prometheus"].units["prometheus/0"].address
-    prometheus = Prometheus(url=prometheus_url)
-    assert prometheus.has_metric(name="up", labels={"juju_application": "avalanche"})
-    assert prometheus.has_metric(name=".*", labels={"juju_application": "avalanche"})
+    address = juju.status().apps["prometheus"].units["prometheus/0"].address
+    prometheus = Prometheus(url=f"http://{address}:9090")
+    prometheus.wait_for_metric(name="up", labels={"juju_application": "avalanche"})
+    prometheus.wait_for_metric(name=".*", labels={"juju_application": "avalanche"})

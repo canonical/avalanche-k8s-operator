@@ -8,7 +8,14 @@ from dataclasses import dataclass, field
 from typing import Any
 
 import requests
-from tenacity import retry, retry_if_exception_type, stop_after_delay, wait_exponential
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    retry_if_result,
+    stop_after_delay,
+    wait_exponential,
+    wait_fixed,
+)
 
 
 @dataclass
@@ -93,6 +100,34 @@ class Prometheus:
         promql = "{" + ", ".join(pairs) + "}"
         result = self.query(promql)
         return len(result.get("data", {}).get("result", [])) > 0
+
+    def wait_for_metric(
+        self,
+        name: str | None = None,
+        labels: dict[str, str] | None = None,
+        *,
+        timeout: int = 300,
+        interval: int = 15,
+    ) -> None:
+        """Poll until ``has_metric`` returns True.
+
+        Raises AssertionError if the metric is not found within *timeout* seconds.
+        """
+
+        @retry(
+            retry=retry_if_result(lambda r: not r) | retry_if_exception_type(Exception),
+            stop=stop_after_delay(timeout),
+            wait=wait_fixed(interval),
+            reraise=True,
+        )
+        def _poll() -> bool:
+            return self.has_metric(name=name, labels=labels)
+
+        if not _poll():
+            raise AssertionError(
+                f"Timed out after {timeout}s waiting for metric "
+                f"(name={name!r}, labels={labels!r})"
+            )
 
     def has_alert_rule(self, name: str, group: str | None = None) -> bool:
         """Check whether an alerting rule with the given name exists."""
