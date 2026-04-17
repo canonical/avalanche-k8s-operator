@@ -66,7 +66,9 @@ class Prometheus:
 
     def query(self, promql: str) -> dict:
         """Execute an instant PromQL query."""
-        resp = self.session.get(f"{self.url}/api/v1/query", params={"query": promql})
+        resp = self.session.get(
+            f"{self.url}/api/v1/query", params={"query": promql}, timeout=10
+        )
         resp.raise_for_status()
         return resp.json()
 
@@ -75,25 +77,26 @@ class Prometheus:
         resp = self.session.get(
             f"{self.url}/api/v1/query_range",
             params={"query": promql, "start": start, "end": end, "step": step},
+            timeout=10,
         )
         resp.raise_for_status()
         return resp.json()
 
     def get_rules(self) -> dict:
         """Fetch all recording and alerting rules."""
-        resp = self.session.get(f"{self.url}/api/v1/rules")
+        resp = self.session.get(f"{self.url}/api/v1/rules", timeout=10)
         resp.raise_for_status()
         return resp.json()
 
     def get_alerts(self) -> dict:
         """Fetch all active alerts."""
-        resp = self.session.get(f"{self.url}/api/v1/alerts")
+        resp = self.session.get(f"{self.url}/api/v1/alerts", timeout=10)
         resp.raise_for_status()
         return resp.json()
 
     def get_targets(self) -> dict:
         """Fetch all scrape targets."""
-        resp = self.session.get(f"{self.url}/api/v1/targets")
+        resp = self.session.get(f"{self.url}/api/v1/targets", timeout=10)
         resp.raise_for_status()
         return resp.json()
 
