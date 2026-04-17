@@ -6,6 +6,7 @@
 
 import hashlib
 import logging
+import re
 import socket
 from typing import Optional, cast
 
@@ -117,9 +118,17 @@ class AvalancheCharm(CharmBase):
     def _avalanche_version(self) -> Optional[str]:
         if not self.container.can_connect():
             return None
-        version_output, _ = self.container.exec(["/bin/avalanche", "--version"], combine_stderr=True).wait_output()
-        # Output looks like this:
-        # 0.3
+        try:
+            version_output, _ = self.container.exec(
+                ["/bin/avalanche", "--version"], combine_stderr=True
+            ).wait_output()
+        except Exception as e:
+            logger.warning("Failed to get avalanche version: %s", e)
+            return None
+        # v0.7.0+ outputs multi-line: "avalanche, version 0.7.0 (branch: ...)\n  build ..."
+        # Older versions output just: "0.3"
+        if match := re.search(r"version\s+([\d.]+)", version_output):
+            return match.group(1)
         return version_output.strip()
 
     def _update_layer(self) -> bool:
@@ -232,6 +241,8 @@ class AvalancheCharm(CharmBase):
                 K8sServicePatch.set_ports(self.app.name, service_ports)
             except PatchFailed as e:
                 logger.error("Unable to patch the Kubernetes service: %s", str(e))
+            except Exception as e:
+                logger.error("Unexpected error patching the Kubernetes service: %s", str(e))
             else:
                 logger.debug("Successfully patched the Kubernetes service")
 

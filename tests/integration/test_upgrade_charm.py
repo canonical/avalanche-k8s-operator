@@ -6,14 +6,14 @@ import pytest
 
 
 @pytest.mark.abort_on_fail
-async def test_upgrade_charm(juju: jubilant.Juju, charm):
+def test_upgrade_charm(juju: jubilant.Juju, charm, charm_resources):
     """Deploy the avalanche and deploy it together with related charms."""
     juju.deploy(
         "avalanche-k8s",
         "avalanche",
-        channel="2/edge",
+        channel="dev/edge",
         config={"metric_count": "33", "value_interval": "99999"},
     )
     juju.wait(jubilant.all_active)
-    juju.refresh("avalanche", path=charm)
+    juju.refresh("avalanche", path=charm, resources=charm_resources)
     juju.wait(jubilant.all_active)

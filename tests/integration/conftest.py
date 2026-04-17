@@ -11,14 +11,15 @@ import yaml
 
 
 @pytest.fixture(scope="module")
-async def charm():
+def charm():
     """Charm used for integration testing."""
     if charm_file := os.environ.get("CHARM_PATH"):
-        return Path(charm_file)
+        return Path(charm_file).absolute()
 
-    charm = sh.charmcraft.pack()  # type: ignore
-    assert charm
-    return charm
+    sh.charmcraft.pack()  # type: ignore
+    charms = sorted(Path(".").glob("*.charm"))
+    assert charms, "No .charm file found after 'charmcraft pack'"
+    return charms[-1].resolve()
 
 
 @pytest.fixture(scope="module")
