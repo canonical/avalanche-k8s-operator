@@ -3,7 +3,7 @@
 # See LICENSE file for licensing details.
 import jubilant
 import pytest
-from helpers import assert_metrics_found
+from helpers import Prometheus
 
 
 @pytest.mark.abort_on_fail
@@ -15,12 +15,7 @@ def test_avalanche_is_scraped_by_prometheus(juju: jubilant.Juju, charm, charm_re
     juju.wait(jubilant.all_active)
 
     # Verify the scrape target is up
-    result = assert_metrics_found(
-        juju, 'up{juju_application="avalanche"}', timeout=300
-    )
-    assert any(
-        sample["value"][1] == "1" for sample in result
-    ), f"Expected 'up' metric to be 1 for avalanche, got: {result}"
-
-    # Verify actual avalanche-generated metrics are present
-    assert_metrics_found(juju, '{juju_application="avalanche", __name__=~".+"}', timeout=60)
+    prometheus_url = juju.status().apps["prometheus"].units["prometheus/0"].address
+    prometheus = Prometheus(url=prometheus_url)
+    assert prometheus.has_metric(name="up", labels={"juju_application": "avalanche"})
+    assert prometheus.has_metric(name=".*", labels={"juju_application": "avalanche"})

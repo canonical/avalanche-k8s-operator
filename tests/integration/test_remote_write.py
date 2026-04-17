@@ -3,7 +3,7 @@
 # See LICENSE file for licensing details.
 import jubilant
 import pytest
-from helpers import assert_metrics_found
+from helpers import Prometheus
 
 
 @pytest.mark.abort_on_fail
@@ -14,6 +14,8 @@ def test_avalanche_remote_writes_to_prometheus(juju: jubilant.Juju, charm, charm
     juju.integrate("avalanche:send-remote-write", "prometheus:receive-remote-write")
     juju.wait(jubilant.all_active)
 
+    prometheus_url = juju.status().apps["prometheus"].units["prometheus/0"].address
+    prometheus = Prometheus(url=prometheus_url)
     # Remote-written metrics won't have an 'up' target, so query for avalanche-generated metrics
     # directly. Avalanche metric names are auto-generated with the configured metricname_length.
-    assert_metrics_found(juju, '{job=~".*avalanche.*"}', timeout=300)
+    assert prometheus.has_metric(name=".*", labels={"job": ".*avalanche.*"})
