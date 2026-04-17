@@ -11,6 +11,7 @@ import requests
 from tenacity import (
     retry,
     retry_if_exception_type,
+    retry_if_result,
     stop_after_delay,
     wait_exponential,
 )
@@ -45,6 +46,21 @@ class Prometheus:
         self.get_rules = self._retry_on_error(self.get_rules)
         self.get_alerts = self._retry_on_error(self.get_alerts)
         self.get_targets = self._retry_on_error(self.get_targets)
+
+        # Wrap check methods so they also retry when the result is False
+        # (e.g. metric not yet scraped).
+        _retry_until_true = retry(
+            retry=retry_if_result(lambda r: r is False)
+            | retry_if_exception_type((requests.ConnectionError, requests.Timeout)),
+            wait=wait_exponential(multiplier=1, max=30),
+            stop=stop_after_delay(self.timeout),
+            reraise=True,
+        )
+        self.has_metric = _retry_until_true(self.has_metric)
+        self.has_alert_rule = _retry_until_true(self.has_alert_rule)
+        self.has_alert_rules = _retry_until_true(self.has_alert_rules)
+        self.has_active_alert = _retry_until_true(self.has_active_alert)
+        self.has_target = _retry_until_true(self.has_target)
 
     # --- HTTP methods (public, return parsed data) ---
 
