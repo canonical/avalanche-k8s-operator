@@ -74,6 +74,7 @@ class AvalancheCharm(CharmBase):
             self,
             forward_alert_rules=self._forward_alert_rules,
             refresh_event=[self.on.config_changed],
+            peer_relation_name="replicas",
         )
         self.framework.observe(
             self.remote_write_consumer.on.endpoints_changed,  # pyright: ignore
