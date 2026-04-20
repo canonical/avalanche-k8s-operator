@@ -95,3 +95,10 @@ config:
       description: >
         Toggle forwarding of alert rules.
       default: True
+    enable_watchdog_alerts:
+      type: boolean
+      description: >
+        Toggle watchdog alert rules that always fire, to test your alerting pipeline.
+        Set to false to disable the always-firing alerts (AlwaysFiringDueToNumericValue
+        and AlwaysFiringDueToAbsentMetric).
+      default: True

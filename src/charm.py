@@ -52,6 +52,12 @@ class AvalancheCharm(CharmBase):
         self.unit.set_ports(self._port)
 
         self._forward_alert_rules = cast(bool, self.config["forward_alert_rules"])
+        self._enable_watchdog_alerts = cast(bool, self.config["enable_watchdog_alerts"])
+        _alert_rules_path = (
+            "./src/prometheus_alert_rules/watchdog"
+            if self._enable_watchdog_alerts
+            else "./src/prometheus_alert_rules"
+        )
 
         self.metrics_endpoint = MetricsEndpointProvider(
             self,
@@ -65,6 +71,7 @@ class AvalancheCharm(CharmBase):
                     "scrape_timeout": "10s",
                 }
             ],
+            alert_rules_path=_alert_rules_path,
             forward_alert_rules=self._forward_alert_rules,
             refresh_event=[self.on.config_changed],
             external_url=socket.getfqdn(),
@@ -72,6 +79,7 @@ class AvalancheCharm(CharmBase):
 
         self.remote_write_consumer = PrometheusRemoteWriteConsumer(
             self,
+            alert_rules_path=_alert_rules_path,
             forward_alert_rules=self._forward_alert_rules,
             refresh_event=[self.on.config_changed],
             peer_relation_name="replicas",
