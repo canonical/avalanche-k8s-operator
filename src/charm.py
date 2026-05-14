@@ -15,6 +15,7 @@ from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from charms.prometheus_k8s.v1.prometheus_remote_write import (
     PrometheusRemoteWriteConsumer,
 )
+from charmlibs.interfaces.service_mesh import ServiceMeshConsumer, UnitPolicy
 from ops import main
 from ops.charm import CharmBase
 from ops.framework import StoredState
@@ -51,6 +52,16 @@ class AvalancheCharm(CharmBase):
         self.container = self.unit.get_container(self._container_name)
         self.unit.set_ports(self._port)
 
+        self._mesh = ServiceMeshConsumer(
+            self,
+            policies=[
+                UnitPolicy(
+                    relation="metrics-endpoint",
+                    ports=[self.port],
+                ),
+            ],
+        )
+        
         self._forward_alert_rules = cast(bool, self.config["forward_alert_rules"])
 
         self.metrics_endpoint = MetricsEndpointProvider(

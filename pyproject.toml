@@ -13,6 +13,7 @@ dependencies = [
   "cryptography",
   "pydantic",
   "cosl",
+  "charmlibs-interfaces-service-mesh>=1.0.1",
 ]
 
 [project.optional-dependencies]
