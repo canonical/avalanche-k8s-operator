@@ -10,12 +10,12 @@ import re
 import socket
 from typing import Optional, cast
 
+from charmlibs.interfaces.service_mesh import ServiceMeshConsumer, UnitPolicy
 from charms.grafana_k8s.v0.grafana_dashboard import GrafanaDashboardProvider
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from charms.prometheus_k8s.v1.prometheus_remote_write import (
     PrometheusRemoteWriteConsumer,
 )
-from charmlibs.interfaces.service_mesh import ServiceMeshConsumer, UnitPolicy
 from ops import main
 from ops.charm import CharmBase
 from ops.framework import StoredState
@@ -61,7 +61,7 @@ class AvalancheCharm(CharmBase):
                 ),
             ],
         )
-        
+
         self._forward_alert_rules = cast(bool, self.config["forward_alert_rules"])
 
         self.metrics_endpoint = MetricsEndpointProvider(
