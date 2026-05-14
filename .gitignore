@@ -6,3 +6,5 @@ build/
 __pycache__/
 *.py[cod]
 .tox/
+.terraform/
+.terraform.lock.hcl
