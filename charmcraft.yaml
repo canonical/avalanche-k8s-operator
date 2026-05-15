@@ -41,10 +41,19 @@ provides:
     interface: prometheus_scrape
   grafana-dashboard:
     interface: grafana_dashboard
+  provide-cmr-mesh:  # server-side-for-cmr-mesh
+    interface: cross_model_mesh
 
 requires:
   send-remote-write:
     interface: prometheus_remote_write
+  service-mesh:
+    limit: 1
+    interface: service_mesh
+  require-cmr-mesh:
+    # TODO: remove this relation when this is fixed:
+    #   https://github.com/canonical/istio-beacon-k8s-operator/issues/91
+    interface: cross_model_mesh
 
 peers:
   replicas:
