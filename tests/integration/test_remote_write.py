@@ -12,7 +12,7 @@ def test_avalanche_remote_writes_to_prometheus(juju: jubilant.Juju, charm, charm
     juju.deploy(charm, "avalanche", resources=charm_resources)
     juju.deploy("prometheus-k8s", "prometheus", channel="2/edge", trust=True)
     juju.integrate("avalanche:send-remote-write", "prometheus:receive-remote-write")
-    juju.wait(jubilant.all_active)
+    juju.wait(lambda status: jubilant.all_active(status) and jubilant.all_idle(status), timeout=5 * 60)
 
     prometheus_address = juju.status().apps["prometheus"].address
     prometheus_url = f"http://{prometheus_address}:9090"
