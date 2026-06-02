@@ -10,6 +10,7 @@ import re
 import socket
 from typing import Optional, cast
 
+from charmlibs.interfaces.service_mesh import ServiceMeshConsumer, UnitPolicy
 from charms.grafana_k8s.v0.grafana_dashboard import GrafanaDashboardProvider
 from charms.prometheus_k8s.v0.prometheus_scrape import MetricsEndpointProvider
 from charms.prometheus_k8s.v1.prometheus_remote_write import (
@@ -50,6 +51,16 @@ class AvalancheCharm(CharmBase):
 
         self.container = self.unit.get_container(self._container_name)
         self.unit.set_ports(self._port)
+
+        self._mesh = ServiceMeshConsumer(
+            self,
+            policies=[
+                UnitPolicy(
+                    relation="metrics-endpoint",
+                    ports=[self.port],
+                ),
+            ],
+        )
 
         self._forward_alert_rules = cast(bool, self.config["forward_alert_rules"])
 
