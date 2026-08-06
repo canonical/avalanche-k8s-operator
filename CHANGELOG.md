@@ -14,6 +14,8 @@ Changes on `track/0.7` since the common ancestor with `track/2` (`233a528`).
 
 ## Others
 
+- chore: refresh charms.just from canonical/observability ([4f466c8](https://github.com/canonical/avalanche-k8s-operator/commit/4f466c87ede76f1e7a812d1e08cfe88a68db3f9e))
+- ci: allow manually calling the release workflow ([01b6302](https://github.com/canonical/avalanche-k8s-operator/commit/01b630259dcee027896e1c2de32cd1a8169760da))
 - chore: update charm libraries ([43ff6f6](https://github.com/canonical/avalanche-k8s-operator/commit/43ff6f633f668c88ac04676277f8b02fd38d8ad6))
 - ci: fix token permissions for release workflow ([#81](https://github.com/canonical/avalanche-k8s-operator/pull/81))
 - ci: add explicit workflow permissions for CodeQL ([#80](https://github.com/canonical/avalanche-k8s-operator/pull/80))
