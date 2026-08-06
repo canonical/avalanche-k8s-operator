@@ -2,14 +2,14 @@
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.6 |
 | <a name="requirement_juju"></a> [juju](#requirement\_juju) | ~> 1.0 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_juju"></a> [juju](#provider\_juju) | ~> 1.0 |
 
 ## Modules
@@ -19,7 +19,7 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_app_name"></a> [app\_name](#input\_app\_name) | n/a | `string` | `"avalanche"` | no |
 | <a name="input_channel"></a> [channel](#input\_channel) | n/a | `string` | `"dev/edge"` | no |
 | <a name="input_charm_name"></a> [charm\_name](#input\_charm\_name) | n/a | `string` | `"avalanche-k8s"` | no |
@@ -33,7 +33,7 @@ No modules.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_app_name"></a> [app\_name](#output\_app\_name) | n/a |
 | <a name="output_provides"></a> [provides](#output\_provides) | n/a |
 | <a name="output_requires"></a> [requires](#output\_requires) | n/a |
